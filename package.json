@@ -6,6 +6,11 @@
   "repository": "https://gitlab.com/recagua/helpdesk-backend",
   "author": "Diego Donis",
   "license": "MIT",
+  "scripts": {
+    "start": "src/index.ts",
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn src/index.ts"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.3",
