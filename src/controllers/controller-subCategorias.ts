@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { getPool } from '../database'
 import { Int } from 'mssql'
 import { bodySubcategoria } from '../interfaces/interface-subCategorias'
-export class SubSubCategorias {
+export class Subcategorias {
     async getAll(req: Request, res: Response) {
         try {
             const pool = await getPool()
