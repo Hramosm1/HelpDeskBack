@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { getPool } from '../database'
 import { Int } from 'mssql/msnodesqlv8'
+import { bodyEstados } from "../interfaces/interface-estados";
 export class Estados {
     async getAll(req: Request, res: Response) {
         try {
@@ -24,7 +25,7 @@ export class Estados {
         }
     }
     async create(req: Request, res: Response) {
-        const body: { nombre: string } = req.body
+        const body: bodyEstados = req.body
         try {
             const pool = await getPool()
             const request = pool?.request()
@@ -37,7 +38,7 @@ export class Estados {
     }
     async editById(req: Request, res: Response) {
         const { id } = req.params
-        const body: { nombre: string } = req.body
+        const body: bodyEstados = req.body
         try {
             const pool = await getPool()
             const request = pool?.request()
