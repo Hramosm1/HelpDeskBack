@@ -1,1 +1,4 @@
-export interface iPrioridades {}
+export interface bodyPrioridades {
+  nombre: string;
+  color: string;
+}
