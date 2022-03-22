@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { getPool } from '../database'
-import { Int } from 'mssql'
+import { Int } from 'mssql/msnodesqlv8'
 import { bodyPrioridades } from "../interfaces/interface-prioridades";
 export class Prioridades {
     async getAll(req: Request, res: Response) {

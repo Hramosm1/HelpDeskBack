@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { getPool } from '../database'
-import { Int } from 'mssql'
+import { Int } from 'mssql/msnodesqlv8'
 export class Comentariostickets {
     async getAll(req: Request, res: Response) {
         const pool = await getPool()
