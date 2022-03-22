@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { getPool } from '../database'
-import { Int } from 'mssql'
+import { Int } from 'mssql/msnodesqlv8'
 import { bodySubcategoria } from '../interfaces/interface-subCategorias'
 export class Subcategorias {
     async getAll(req: Request, res: Response) {
