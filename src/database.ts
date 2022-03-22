@@ -1,4 +1,4 @@
-import { connect, config, ConnectionError } from "mssql";
+import { connect, config, ConnectionError } from "mssql/msnodesqlv8";
 import dotenv from "dotenv"
 
 dotenv.config()
