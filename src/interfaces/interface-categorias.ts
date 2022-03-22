@@ -1,1 +1,3 @@
-export interface iCategorias {}
+export interface bodyCategoria {
+  nombre: string;
+}
