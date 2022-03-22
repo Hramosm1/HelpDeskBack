@@ -1,1 +1,4 @@
-export interface iSubcategorias {}
+export interface bodySubcategoria {
+  nombre: string;
+  idCategoria: number
+}

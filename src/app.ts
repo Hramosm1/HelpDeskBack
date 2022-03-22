@@ -2,9 +2,10 @@
 import express, { Application, json, urlencoded } from "express";
 import cors from "cors";
 //importacion de rutas
-import estados from './routes/estados'
+import estados from './routes/estados';
 import categorias from "./routes/categorias";
-import prioridades from "./routes/prioridades"
+import prioridades from "./routes/prioridades";
+import subCategorias from "./routes/subCategorias";
 export class App {
   base: string = "/node/api";
   private app: Application;
@@ -29,6 +30,7 @@ export class App {
     this.app.use('/estados', estados)
     this.app.use('/categorias', categorias)
     this.app.use('/prioridades', prioridades)
+    this.app.use('/subCategorias', subCategorias)
   }
 
   //funcion publica que inicia el servidor
