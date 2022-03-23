@@ -6,9 +6,9 @@ import estados from './routes/estados';
 import categorias from "./routes/categorias";
 import prioridades from "./routes/prioridades";
 import subCategorias from "./routes/subCategorias";
-export class App {
+class App {
   base: string = "/node/api";
-  private app: Application;
+  app: Application;
   constructor(port?: number | string) {
     this.app = express();
     this.settings();
@@ -39,3 +39,4 @@ export class App {
     console.log("server on port: ", this.app.get("port"));
   }
 }
+export const app = new App()
