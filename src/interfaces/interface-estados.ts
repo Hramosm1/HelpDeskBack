@@ -1,7 +1,7 @@
-export interface iEstados {
-  id?: number;
+export interface iEstado {
+  id: number;
   nombre: string;
-  activo: string;
+  activo?: boolean;
 }
 export interface bodyEstados {
   nombre: string;
