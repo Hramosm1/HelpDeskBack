@@ -36,7 +36,6 @@ describe('POST /estados', () => {
       if (id) {
         const bodyExpect: iEstado = { id, nombre: 'prueba jest', activo: true }
         const result = await request(app.app).get(`/estados/${id}`)
-        console.log(result.body)
         expect(result.body).toMatchObject(bodyExpect)
       }
     }
