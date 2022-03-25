@@ -36,7 +36,6 @@ describe('POST /prioridades', () => {
       if (id) {
         const bodyExpect: iPrioridad = { id, nombre: 'prueba jest', color: 'jest', activo: true }
         const result = await request(app.app).get(`/prioridades/${id}`)
-        console.log(result.body)
         expect(result.body).toMatchObject(bodyExpect)
       }
     }
