@@ -1,37 +1,38 @@
 import { Request, Response } from 'express'
 import { getPool } from '../database'
-import { Int } from 'mssql/msnodesqlv8'
+import { UniqueIdentifier, VarChar } from 'mssql/msnodesqlv8'
 export class Comentariostickets {
-    async getAll(req: Request, res: Response) {
-        const pool = await getPool()
-        try {
-            const result = await pool?.query('')
-            res.send(result.recordset)
-        } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
-        }
-    }
+
     async getById(req: Request, res: Response) {
-        const pool = await getPool()
         const { id } = req.params
         try {
-            const request = pool.request()
-            request.input('id', Int, id)
+            const pool = await getPool()
+            const request = pool?.request()
+            request?.input('id', UniqueIdentifier, id)
+            const result = await request?.query('SELECT id, nombre, usuario, idTicket, idUsuario, fecha, comentario FROM VW_Comentarios WHERE idTicket = @id ORDER BY fecha ASC')
+            res.send(result?.recordset)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
         }
     }
     async create(req: Request, res: Response) {
-        const pool = await getPool()
-        const body = req.body
+        console.log('entra en comentarios')
+        const { ticket, usuario, comentario } = req.body
+        console.log(req.body)
         try {
-            const request = pool.request()
-            request.input()
+            const pool = await getPool()
+            const request = pool?.request()
+            request?.input('ticket', UniqueIdentifier, ticket)
+            request?.input('usuario', UniqueIdentifier, usuario)
+            request?.input('comentario', VarChar, comentario)
+            const result = await request?.query('INSERT INTO Comentarios (idTicket, idUsuario, comentario) VALUES (@ticket, @usuario, @comentario)')
+            console.log(result)
+            res.send(result)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
         }
     }
-    async editById(req: Request, res: Response) {
+    /*async editById(req: Request, res: Response) {
         const pool = await getPool()
         const { id } = req.params
         try {
@@ -50,5 +51,5 @@ export class Comentariostickets {
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
         }
-    }
+    }*/
 }

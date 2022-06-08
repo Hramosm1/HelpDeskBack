@@ -1,5 +1,7 @@
 import request from "supertest";
 import { app } from "../src/app";
+import { iCategoria } from "../src/interfaces/interface-categorias";
+import { bodySubcategoria, iSubCategoria } from "../src/interfaces/interface-subCategorias";
 
 //GETS
 describe('GET /subCategorias', () => {
@@ -21,55 +23,34 @@ describe('GET /subCategorias/:id', () => {
 })
 
 //POST
-/*describe('POST /subCategorias', () => {
+describe('POST /subCategorias', () => {
   test('Filas afectadas son mayor que 0', async () => {
-    const body: bodyCategoria = { nombre: 'prueba jest' }
-    const result = await request(app.app).post('/subCategorias').send(body)
-    expect(result.body.rowsAffected[0]).toBeGreaterThan(0)
-  })
-  test('Verifica que se haya creado', async () => {
-    const last = await request(app.app).get('/subCategorias')
-    if (Array.isArray(last.body)) {
-      const content: Array<iCategoria> = last.body
-      const id: number | undefined = content.find(val => val.nombre === 'prueba jest')?.id
-      if (id) {
-        const bodyExpect: iCategoria = { id, nombre: 'prueba jest', activo: true }
-        const result = await request(app.app).get(`/subCategorias/${id}`)
-        console.log(result.body)
-        expect(result.body).toMatchObject(bodyExpect)
-      }
+    const idCategoriaRequest = await request(app.app).get('/categorias')
+    if (idCategoriaRequest.body.length > 0) {
+      const categoria: iCategoria = idCategoriaRequest.body[0]
+      const body: bodySubcategoria = { nombre: 'prueba jest', idCategoria: categoria.id }
+      const result = await request(app.app).post('/subCategorias').send(body)
+      expect(result.body.rowsAffected[0]).toBeGreaterThan(0)
     }
-    else expect(false).toBe(true)
+    console.info('AGREGE UNA CATEGORIA PARA CREAR UNA SUB CATEGORIA')
   })
 })
 
 //PUT
 describe('POST /subCategorias', () => {
   test('Filas afectadas son mayor que 0', async () => {
-    const last = await request(app.app).get('/subCategorias')
-    if (Array.isArray(last.body)) {
-      const content: Array<iCategoria> = last.body
-      const id: number | undefined = content.find(val => val.nombre === 'prueba jest')?.id
-      if (id) {
-        const body: bodyCategoria = { nombre: 'prueba jest editada' }
-        const result = await request(app.app).put(`/subCategorias/${id}`).send(body)
+    const subCategorias = await request(app.app).get('/subCategorias')
+    if (Array.isArray(subCategorias.body)) {
+      let body: iSubCategoria = subCategorias.body.find(val => val.nombre === 'prueba jest')
+      if (body) {
+        const result = await request(app.app).put('subCategorias').send(body)
         expect(result.body.rowsAffected[0]).toBeGreaterThan(0)
       }
-    }
-    else expect(false).toBe(true)
-  })
-  test('Verifica que se haya editado', async () => {
-    const last = await request(app.app).get('/subCategorias')
-    if (Array.isArray(last.body)) {
-      const content: Array<iCategoria> = last.body
-      const id: number | undefined = content.find(val => val.nombre === 'prueba jest editada')?.id
-      if (id) {
-        const bodyExpect: iCategoria = { id, nombre: 'prueba jest editada', activo: true }
-        const result = await request(app.app).get(`/subCategorias/${id}`)
-        expect(result.body).toMatchObject(bodyExpect)
+      else {
+        console.info('FALLO DESDE LA CREACION')
       }
     }
-    else expect(false).toBe(true)
+    console.info('AGREGE UNA CATEGORIA PARA CREAR UNA SUB CATEGORIA')
   })
 })
 
@@ -78,7 +59,7 @@ describe('DELETE /subCategorias/:id', () => {
   test('Filas afectadas son mayor que 0', async () => {
     const last = await request(app.app).get('/subCategorias')
     if (Array.isArray(last.body)) {
-      const content: Array<iCategoria> = last.body
+      const content: Array<iSubCategoria> = last.body
       const id: number | undefined = content.find(val => val.nombre === 'prueba jest editada')?.id
       if (id) {
         const result = await request(app.app).delete(`/subCategorias/${id}`)
@@ -88,4 +69,3 @@ describe('DELETE /subCategorias/:id', () => {
     else expect(false).toBe(true)
   })
 })
-*/

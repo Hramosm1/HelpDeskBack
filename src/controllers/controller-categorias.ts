@@ -7,6 +7,7 @@ export class Categorias {
         try {
             const pool = await getPool()
             const result = await pool?.query('SELECT id, nombre from Categorias WHERE activo = 1')
+            await pool?.close()
             res.send(result?.recordsets[0])
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
@@ -19,6 +20,7 @@ export class Categorias {
             const request = pool?.request()
             request?.input('id', Int, id)
             const result = await request?.query('SELECT id, nombre, activo from Categorias WHERE id = @id')
+            await pool?.close()
             res.send(result?.recordset[0])
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
@@ -31,6 +33,7 @@ export class Categorias {
             const request = pool?.request()
             request?.input('nombre', body.nombre)
             const result = await request?.query('INSERT INTO Categorias (nombre) VALUES (@nombre)')
+
             res.send(result)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
@@ -45,6 +48,7 @@ export class Categorias {
             request?.input('id', Int, id)
             request?.input('nombre', body.nombre)
             const result = await request?.query('UPDATE Categorias SET nombre = @nombre WHERE id = @id')
+
             res.send(result)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
@@ -57,6 +61,7 @@ export class Categorias {
             const request = pool?.request()
             request?.input('id', Int, id)
             const result = await request?.query('UPDATE Categorias SET activo = 0 WHERE id = @id')
+
             res.send(result)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
