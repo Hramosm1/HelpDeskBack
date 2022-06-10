@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { getPool } from '../database'
-import { UniqueIdentifier, VarChar } from 'mssql/msnodesqlv8'
+import { Int, UniqueIdentifier, VarChar } from 'mssql/msnodesqlv8'
 export class Comentariostickets {
 
     async getById(req: Request, res: Response) {
@@ -8,7 +8,7 @@ export class Comentariostickets {
         try {
             const pool = await getPool()
             const request = pool?.request()
-            request?.input('id', UniqueIdentifier, id)
+            request?.input('id', Int, id)
             const result = await request?.query('SELECT id, nombre, usuario, idTicket, idUsuario, fecha, comentario FROM VW_Comentarios WHERE idTicket = @id ORDER BY fecha ASC')
             res.send(result?.recordset)
         } catch (ex: any) {
@@ -22,7 +22,7 @@ export class Comentariostickets {
         try {
             const pool = await getPool()
             const request = pool?.request()
-            request?.input('ticket', UniqueIdentifier, ticket)
+            request?.input('ticket', Int, ticket)
             request?.input('usuario', UniqueIdentifier, usuario)
             request?.input('comentario', VarChar, comentario)
             const result = await request?.query('INSERT INTO Comentarios (idTicket, idUsuario, comentario) VALUES (@ticket, @usuario, @comentario)')
