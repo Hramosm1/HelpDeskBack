@@ -17,7 +17,7 @@ export class Tickets {
             const pool = await getPool()
             const request = pool?.request()
             request?.input('id', UniqueIdentifier, id)
-            const result = await request?.query('SELECT id, titulo, descripcion, prioridad, colorPrioridad, estado, activo FROM VW_Tickets WHERE idSolicitante = @id AND activo = 1')
+            const result = await request?.query('SELECT id, titulo, descripcion, prioridad, colorPrioridad, estado, activo FROM VW_Tickets WHERE idSolicitante = @id')
             res.send(result?.recordset)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
@@ -28,7 +28,7 @@ export class Tickets {
         try {
             const pool = await getPool()
             const request = pool?.request()
-            request?.input('id', UniqueIdentifier, id)
+            request?.input('id', Int, id)
             const result = await request?.query('SELECT * FROM VW_Tickets WHERE id = @id')
             res.send(result?.recordset[0])
         } catch (ex: any) {
@@ -66,7 +66,7 @@ export class Tickets {
         try {
             const pool = await getPool()
             const request = pool?.request()
-            request?.input('id', UniqueIdentifier, id)
+            request?.input('id', Int, id)
             request?.input('estado', Int, idEstado)
             const result = await request?.query('UPDATE Tickets SET activo = 0, idEstado = @estado WHERE id = @id')
             res.send(result)
