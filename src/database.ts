@@ -7,9 +7,11 @@ dotenv.config()
 const sqlConfig: config = {
   server: process.env.SERVER || '',
   database: process.env.DATABASE,
+  user: process.env.USERAPP,
+  password: process.env.PASSAPP,
   driver: 'msnodesqlv8',
   options: {
-    trustedConnection: true,
+    trustedConnection: Boolean(process.env.WINAUTH),
     trustServerCertificate: true
   }
 }

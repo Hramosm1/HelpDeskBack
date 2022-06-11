@@ -1,11 +1,11 @@
 import { request, Request, Response } from 'express'
 import { getPool } from '../database'
-import { Int, VarChar, UniqueIdentifier } from 'mssql/msnodesqlv8'
+import { Int, VarChar, UniqueIdentifier, Bit } from 'mssql/msnodesqlv8'
 export class Tickets {
     async getAll(req: Request, res: Response) {
         try {
             const pool = await getPool()
-            const result = await pool?.query('SELECT id, titulo, descripcion, prioridad, colorPrioridad, estado, activo FROM VW_Tickets')
+            const result = await pool?.query('SELECT id, titulo, prioridad, colorPrioridad, estado,  asignadoA, solicitudDe, fechaSolicitud, activo FROM VW_Tickets')
             res.send(result?.recordset)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
@@ -17,7 +17,7 @@ export class Tickets {
             const pool = await getPool()
             const request = pool?.request()
             request?.input('id', UniqueIdentifier, id)
-            const result = await request?.query('SELECT id, titulo, descripcion, prioridad, colorPrioridad, estado, activo FROM VW_Tickets WHERE idSolicitante = @id')
+            const result = await request?.query('SELECT id, titulo, prioridad, colorPrioridad, estado, asignadoA, solicitudDe, fechaSolicitud, activo FROM VW_Tickets WHERE idSolicitante = @id')
             res.send(result?.recordset)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
@@ -49,7 +49,7 @@ export class Tickets {
             const idInserted = await request?.query('INSERT INTO Tickets (titulo, descripcion, idPrioridad, idEstado, solicitudDe, asignadoA) output INSERTED.id VALUES (@titulo, @descripcion, @idPrioridad, @idEstado, @solicitadoPor, @asignadoA)')
             if (categorias.length > 0) {
                 const request2 = pool?.request()
-                request2?.input('id', UniqueIdentifier, idInserted?.recordset[0].id)
+                request2?.input('id', Int, idInserted?.recordset[0].id)
                 const queryCategorias = categorias.map((val: number) => `(@id,${val})`).splice(',')
                 const result = await request2?.query('INSERT INTO CategoriasPorTickets (idTicket, idSubCategoria) VALUES' + queryCategorias)
             }
@@ -61,14 +61,14 @@ export class Tickets {
     }
     async cerrarTicket(req: Request, res: Response) {
         const { id } = req.params
-        const { idEstado } = req.body
-        console.log(req.params, req.body)
+        const { idEstado, activo } = req.body
         try {
             const pool = await getPool()
             const request = pool?.request()
             request?.input('id', Int, id)
             request?.input('estado', Int, idEstado)
-            const result = await request?.query('UPDATE Tickets SET activo = 0, idEstado = @estado WHERE id = @id')
+            request?.input('activo', Bit, activo)
+            const result = await request?.query('UPDATE Tickets SET activo = @activo, idEstado = @estado WHERE id = @id')
             res.send(result)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
