@@ -74,17 +74,21 @@ export class Tickets {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
         }
     }
-    /* async editById(req: Request, res: Response) {
-         const pool = await getPool()
-         const { id } = req.params
-         try {
-             const request = pool.request()
-             request.input('id', Int, id)
-         } catch (ex: any) {
-             res.status(404).send({ message: 'error en la consulta', error: ex.message })
-         }
-     }
-     async deleteById(req: Request, res: Response) {
+    async editById(req: Request, res: Response) {
+        const { id } = req.params
+        const { personal } = req.body
+        try {
+            const pool = await getPool()
+            const request = pool?.request()
+            request?.input('id', Int, id)
+            request?.input('personal', Int, personal)
+            const result = await request?.query('UPDATE Tickets SET asignadoA = @personal WHERE id = @id')
+            res.send(result)
+        } catch (ex: any) {
+            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+        }
+    }
+    /* async deleteById(req: Request, res: Response) {
          const pool = await getPool()
          const { id } = req.params
          try {
