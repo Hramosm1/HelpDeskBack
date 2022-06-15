@@ -17,7 +17,7 @@ export class Tickets {
             const pool = await getPool()
             const request = pool?.request()
             request?.input('id', UniqueIdentifier, id)
-            const result = await request?.query('SELECT id, titulo, prioridad, colorPrioridad, estado, asignadoA, solicitudDe, fechaSolicitud, activo FROM VW_Tickets WHERE idSolicitante = @id')
+            const result = await request?.query('SELECT id, titulo, prioridad, colorPrioridad, estado, asignadoA, solicitudDe, fechaSolicitud, activo FROM VW_Tickets WHERE idSolicitante = @id OR idUsuarioAsignado = @id')
             res.send(result?.recordset)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
