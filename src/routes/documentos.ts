@@ -1,12 +1,16 @@
 import { Router } from 'express';
 import { Documentos } from '../controllers/controller-documentos'
+import multer, { Options, memoryStorage } from "multer";
+
+const opts: Options = {
+  // dest: '/Aplicaciones/HelpDesk/files'
+  storage: memoryStorage()
+}
+const upload = multer(opts)
+
 const controller = new Documentos()
 const router = Router()
 
-router.get('/',controller.getAll)
-router.get('/:id',controller.getById)
-router.post('/',controller.create)
-router.put('/:id',controller.editById)
-router.delete('/:id',controller.deleteById)
+router.post('/:id', upload.single('file'), controller.uploadMainImage)
 
 export default router
