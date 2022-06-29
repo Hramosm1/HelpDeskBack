@@ -1,54 +1,21 @@
-import { Request, Response } from 'express'
-import { getPool } from '../database'
-import { Int } from 'mssql/msnodesqlv8'
+import { Request, Response } from 'express';
+import { writeFileSync, existsSync, mkdirSync } from "fs";
+import sharp from "sharp";
 export class Documentos {
-    async getAll(req: Request, res: Response) {
-        // const pool = await getPool()
-        // try {
-        //     const result = await pool?.query('')
-        //     res.send(result.recordset)
-        // } catch (ex: any) {
-        //     res.status(404).send({ message: 'error en la consulta', error: ex.message })
-        // }
+
+    async uploadMainImage(req: Request, res: Response) {
+        const { id } = req.params
+        const path = 'C:\\Aplicaciones\\Help Desk\\files'
+        if (req.file) {
+            const ext = req.file.mimetype.split('/')[1]
+            if (await !existsSync(path)) await mkdirSync(path, { recursive: true })
+            const buff = await sharp(req.file.buffer)
+                .resize(370, null, { fit: "contain" })
+                .toBuffer()
+
+            writeFileSync(`${path}\\${id}.${ext}`, buff)
+            res.send('ok')
+        }
     }
-    async getById(req: Request, res: Response) {
-        // const pool = await getPool()
-        // const { id } = req.params
-        // try {
-        //     const request = pool.request()
-        //     request.input('id', Int, id)
-        // } catch (ex: any) {
-        //     res.status(404).send({ message: 'error en la consulta', error: ex.message })
-        // }
-    }
-    async create(req: Request, res: Response) {
-        // const pool = await getPool()
-        // const body = req.body
-        // try {
-        //     const request = pool.request()
-        //     request.input()
-        // } catch (ex: any) {
-        //     res.status(404).send({ message: 'error en la consulta', error: ex.message })
-        // }
-    }
-    async editById(req: Request, res: Response) {
-        // const pool = await getPool()
-        // const { id } = req.params
-        // try {
-        //     const request = pool.request()
-        //     request.input('id', Int, id)
-        // } catch (ex: any) {
-        //     res.status(404).send({ message: 'error en la consulta', error: ex.message })
-        // }
-    }
-    async deleteById(req: Request, res: Response) {
-        // const pool = await getPool()
-        // const { id } = req.params
-        // try {
-        //     const request = pool.request()
-        //     request.input('id', Int, id)
-        // } catch (ex: any) {
-        //     res.status(404).send({ message: 'error en la consulta', error: ex.message })
-        // }
-    }
+
 }

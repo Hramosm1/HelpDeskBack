@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { getPool } from '../database'
-import { Int, UniqueIdentifier, VarChar } from 'mssql/msnodesqlv8'
+import { Int, MAX, UniqueIdentifier, VarChar } from 'mssql/msnodesqlv8'
 export class Comentariostickets {
 
     async getById(req: Request, res: Response) {
@@ -16,17 +16,14 @@ export class Comentariostickets {
         }
     }
     async create(req: Request, res: Response) {
-        console.log('entra en comentarios')
         const { ticket, usuario, comentario } = req.body
-        console.log(req.body)
         try {
             const pool = await getPool()
             const request = pool?.request()
             request?.input('ticket', Int, ticket)
             request?.input('usuario', UniqueIdentifier, usuario)
-            request?.input('comentario', VarChar, comentario)
+            request?.input('comentario', VarChar(MAX), comentario)
             const result = await request?.query('INSERT INTO Comentarios (idTicket, idUsuario, comentario) VALUES (@ticket, @usuario, @comentario)')
-            console.log(result)
             res.send(result)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
