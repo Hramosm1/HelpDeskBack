@@ -5,7 +5,7 @@ export class Tickets {
     async getAll(req: Request, res: Response) {
         try {
             const pool = await getPool()
-            const result = await pool?.query('SELECT id, titulo, prioridad, colorPrioridad, estado,  asignadoA, solicitudDe, fechaSolicitud, activo FROM VW_Tickets')
+            const result = await pool?.query('SELECT id, titulo, prioridad, colorPrioridad, estado,  asignadoA, solicitudDe, fechaSolicitud, activo FROM VW_Tickets ORDER BY activo DESC')
             res.send(result?.recordset)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
@@ -17,7 +17,7 @@ export class Tickets {
             const pool = await getPool()
             const request = pool?.request()
             request?.input('id', UniqueIdentifier, id)
-            const result = await request?.query('SELECT id, titulo, prioridad, colorPrioridad, estado, asignadoA, solicitudDe, fechaSolicitud, activo FROM VW_Tickets WHERE idSolicitante = @id OR idUsuarioAsignado = @id')
+            const result = await request?.query('SELECT id, titulo, prioridad, colorPrioridad, estado, asignadoA, solicitudDe, fechaSolicitud, activo FROM VW_Tickets WHERE idSolicitante = @id OR idUsuarioAsignado = @id ORDER BY activo DESC')
             res.send(result?.recordset)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
