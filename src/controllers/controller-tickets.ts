@@ -1,11 +1,11 @@
-import { request, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import { getPool } from '../database'
-import { Int, VarChar, UniqueIdentifier, Bit } from 'mssql/msnodesqlv8'
+import { Int, VarChar, UniqueIdentifier, Bit, MAX } from 'mssql/msnodesqlv8'
 export class Tickets {
     async getAll(req: Request, res: Response) {
         try {
             const pool = await getPool()
-            const result = await pool?.query('SELECT id, titulo, prioridad, colorPrioridad, estado,  asignadoA, solicitudDe, fechaSolicitud, activo FROM VW_Tickets')
+            const result = await pool?.query('SELECT id, titulo, prioridad, colorPrioridad, estado,  asignadoA, solicitudDe, fechaSolicitud, activo FROM VW_Tickets ORDER BY activo DESC, id DESC')
             res.send(result?.recordset)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
@@ -17,7 +17,7 @@ export class Tickets {
             const pool = await getPool()
             const request = pool?.request()
             request?.input('id', UniqueIdentifier, id)
-            const result = await request?.query('SELECT id, titulo, prioridad, colorPrioridad, estado, asignadoA, solicitudDe, fechaSolicitud, activo FROM VW_Tickets WHERE idSolicitante = @id OR idUsuarioAsignado = @id')
+            const result = await request?.query('SELECT id, titulo, prioridad, colorPrioridad, estado, asignadoA, solicitudDe, fechaSolicitud, activo FROM VW_Tickets WHERE idSolicitante = @id OR idUsuarioAsignado = @id ORDER BY activo DESC,id DESC')
             res.send(result?.recordset)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
@@ -41,7 +41,7 @@ export class Tickets {
             const pool = await getPool()
             const request = pool?.request()
             request?.input('titulo', VarChar(150), titulo)
-            request?.input('descripcion', VarChar(1000), descripcion)
+            request?.input('descripcion', VarChar(MAX), descripcion)
             request?.input('idPrioridad', Int, prioridad)
             request?.input('idEstado', Int, estado)
             request?.input('solicitadoPor', UniqueIdentifier, solicitudDe)
@@ -54,7 +54,7 @@ export class Tickets {
                 const result = await request2?.query('INSERT INTO CategoriasPorTickets (idTicket, idSubCategoria) VALUES' + queryCategorias)
             }
 
-            res.send({ recordsets: [], recordset: null, rowsAffected: [1] })
+            res.send({ recordsets: [], recordset: null, rowsAffected: [1], id: idInserted?.recordset[0].id })
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
         }
@@ -76,13 +76,14 @@ export class Tickets {
     }
     async editById(req: Request, res: Response) {
         const { id } = req.params
-        const { personal } = req.body
+        const { personal, estado } = req.body
         try {
             const pool = await getPool()
             const request = pool?.request()
             request?.input('id', Int, id)
             request?.input('personal', Int, personal)
-            const result = await request?.query('UPDATE Tickets SET asignadoA = @personal WHERE id = @id')
+            request?.input('estado', estado)
+            const result = await request?.query('UPDATE Tickets SET asignadoA = @personal, idEstado = @estado WHERE id = @id')
             res.send(result)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })

@@ -10,13 +10,14 @@ import prioridades from "./routes/prioridades";
 import subCategorias from "./routes/subCategorias";
 import soporte from "./routes/personalDeSoporte";
 import tickets from "./routes/tickets";
-import comentarios from "./routes/comentariosTickets"
+import comentarios from "./routes/comentariosTickets";
+import documentos from "./routes/documentos";
 class App {
   private serv: http.Server
   app: Application = express();
   io
   private static instance: App
-  private constructor(port?: number | string) {
+  private constructor() {
     this.settings();
     this.midlewares();
     this.routes();
@@ -25,12 +26,12 @@ class App {
   }
   //configuraciones del servidor
   private settings(): void {
-    this.app.set("port", process.env.PORT || 3000);
+    this.app.set("port", process.env.PORT || 9411);
   }
   //midlewares a implementar
   private midlewares(): void {
     this.app.use(cors());
-    this.app.use(json());
+    this.app.use(json({ limit: '2mb' }));
     this.app.use(urlencoded({ extended: false }));
   }
   //rutas
@@ -42,6 +43,7 @@ class App {
     this.app.use('/personalDeSoporte', soporte)
     this.app.use('/tickets', tickets)
     this.app.use('/comentarios', comentarios)
+    this.app.use('/documentos', documentos)
   }
   public static get service() {
     return this.instance || (this.instance = new this())
