@@ -26,12 +26,12 @@ class App {
   }
   //configuraciones del servidor
   private settings(): void {
-    this.app.set("port", 9411);
+    this.app.set("port", process.env.PORT || 9411);
   }
   //midlewares a implementar
   private midlewares(): void {
     this.app.use(cors());
-    this.app.use(json({ limit: '5mb' }));
+    this.app.use(json({ limit: '2mb' }));
     this.app.use(urlencoded({ extended: false }));
   }
   //rutas
