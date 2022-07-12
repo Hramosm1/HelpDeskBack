@@ -16,7 +16,7 @@ export class Estados {
     async getById(req: Request, res: Response) {
         const { id } = req.params
         try {
-            const result = await prisma.estados.findMany({
+            const result = await prisma.estados.findFirst({
                 select: { id: true, nombre: true, activo: true },
                 where: { id: Number(id) }
             })
