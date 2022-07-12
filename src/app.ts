@@ -12,6 +12,7 @@ import soporte from "./routes/personalDeSoporte";
 import tickets from "./routes/tickets";
 import comentarios from "./routes/comentariosTickets";
 import documentos from "./routes/documentos";
+import supertest from "supertest";
 class App {
   private serv: http.Server
   app: Application = express();
@@ -40,10 +41,10 @@ class App {
     this.app.use('/categorias', categorias)
     this.app.use('/prioridades', prioridades)
     this.app.use('/subCategorias', subCategorias)
-    this.app.use('/personalDeSoporte', soporte)
+    // this.app.use('/personalDeSoporte', soporte)
     this.app.use('/tickets', tickets)
     this.app.use('/comentarios', comentarios)
-    this.app.use('/documentos', documentos)
+    // this.app.use('/documentos', documentos)
   }
   public static get service() {
     return this.instance || (this.instance = new this())
@@ -55,3 +56,4 @@ class App {
   }
 }
 export const app = App.service
+export const request = supertest(app.app) 
