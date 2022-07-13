@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { rows } from 'mssql'
 import { prisma } from '../database'
 import { bodyPersonalDeSoporte } from '../interfaces/interface-personalDeSoporte'
 export class Personaldesoporte {
@@ -15,7 +14,7 @@ export class Personaldesoporte {
         const { id } = req.params
         try {
             const row = await prisma.personalDeSoporte.findUnique({ where: { idUsuario: id } })
-            res.send(rows)
+            res.send(row)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
         }
