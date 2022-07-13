@@ -4,6 +4,7 @@ import { prisma } from "../database";
 export class Categorias {
     async getAll(req: Request, res: Response) {
         try {
+            prisma.categorias.findMany({ select: { id: true } })
             const result = await prisma.categorias.findMany({
                 select: { id: true, nombre: true },
                 where: { activo: true }

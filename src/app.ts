@@ -41,7 +41,7 @@ class App {
     this.app.use('/categorias', categorias)
     this.app.use('/prioridades', prioridades)
     this.app.use('/subCategorias', subCategorias)
-    // this.app.use('/personalDeSoporte', soporte)
+    this.app.use('/personalDeSoporte', soporte)
     this.app.use('/tickets', tickets)
     this.app.use('/comentarios', comentarios)
     // this.app.use('/documentos', documentos)
