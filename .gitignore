@@ -3,3 +3,4 @@ node_modules
 yarn*
 package-lock.json
 dist
+prisma/dbml
