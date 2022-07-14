@@ -12,6 +12,7 @@ import soporte from "./routes/personalDeSoporte";
 import tickets from "./routes/tickets";
 import comentarios from "./routes/comentariosTickets";
 import documentos from "./routes/documentos";
+import usuarios from "./routes/usuarios"
 import supertest from "supertest";
 class App {
   private serv: http.Server
@@ -44,6 +45,7 @@ class App {
     this.app.use('/personalDeSoporte', soporte)
     this.app.use('/tickets', tickets)
     this.app.use('/comentarios', comentarios)
+    this.app.use('/usuarios', usuarios)
     // this.app.use('/documentos', documentos)
   }
   public static get service() {

@@ -30,7 +30,7 @@ export class Tickets {
                 val.solicitudDe = users.find(us => us.id = val.solicitudDe)
                 return val
             })
-            const count = await prisma.tickets.count()
+            const count = await prisma.tickets.count({ where })
             res.send({ count, rows })
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
