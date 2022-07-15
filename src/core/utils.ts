@@ -7,7 +7,7 @@ export function setQueryFromTickets(query: any): Prisma.TicketsWhereInput {
         AND.push({ PersonalDeSoporte: { idUsuario: { in: query[key] } } })
         break;
       case 'asignadoA':
-        AND.push({ [key]: { equals: Number(query[key]) } })
+        AND.push({ [key]: { in: query[key].map((id: string) => Number(id)) } })
         break;
       case 'id':
         AND.push({ [key]: { equals: Number(query[key]) } })
@@ -20,6 +20,15 @@ export function setQueryFromTickets(query: any): Prisma.TicketsWhereInput {
         break;
       case 'hasta':
         AND.push({ fechaSolicitud: { lte: query[key] } })
+        break;
+      case 'idEstado':
+        AND.push({ [key]: { in: query[key].map((id: string) => Number(id)) } })
+        break;
+      case 'idPrioridad':
+        AND.push({ [key]: { in: query[key].map((id: string) => Number(id)) } })
+        break;
+      case 'activo':
+        AND.push({ [key]: { equals: query[key] === 'true' ? true : false } })
         break;
       default:
         AND.push({ [key]: { in: query[key] } })

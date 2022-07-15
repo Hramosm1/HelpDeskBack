@@ -31,7 +31,7 @@ export class Personaldesoporte {
     async deleteById(req: Request, res: Response) {
         const { id } = req.params
         try {
-            const result = await prisma.personalDeSoporte.delete({ where: { idUsuario: id } })
+            const result = await prisma.personalDeSoporte.delete({ where: { id: Number(id) } })
             res.send(result)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
