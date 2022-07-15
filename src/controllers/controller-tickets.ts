@@ -38,8 +38,20 @@ export class Tickets {
     }
     async getById(req: Request, res: Response) {
         const { id } = req.params
+        let result
         try {
-            const result = await prisma.$queryRaw`SELECT * FROM VW_Tickets WHERE id = ${id}`
+            const tickets = await prisma.tickets.findUnique({
+                include: {
+                    PersonalDeSoporte: true,
+                    Prioridades: true,
+                    Estados: true,
+                },
+                where: { id: Number(id) }
+            })
+            if (tickets) {
+                const nombreSolicitante = await prisma.$queryRaw`SELECT id, nombre FROM Autenticacion.dbo.Usuarios WHERE id=${tickets.solicitudDe}`
+                result = { ...tickets, nombreSolicitante }
+            }
             res.send(result)
         } catch (ex: any) {
             res.status(404).send({ message: 'error en la consulta', error: ex.message })
@@ -47,6 +59,7 @@ export class Tickets {
     }
     async create(req: Request, res: Response) {
         const { titulo, descripcion, prioridad, estado, categorias, solicitudDe, asignadoA } = req.body
+        const ncategorias = categorias.map((id: number) => ({ idSubCategoria: id }))
         try {
             const result = await prisma.tickets.create({
                 data: {
@@ -56,7 +69,7 @@ export class Tickets {
                     idEstado: estado,
                     solicitudDe,
                     asignadoA,
-                    CategoriasPorTickets: { createMany: { data: categorias } }
+                    CategoriasPorTickets: { createMany: { data: ncategorias } }
                 }
             })
             res.send(result)

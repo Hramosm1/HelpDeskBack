@@ -54,7 +54,7 @@ class App {
   //funcion publica que inicia el servidor
   public async listen(): Promise<void> {
     await this.serv.listen(this.app.get("port"));
-    console.log("server on port: ", this.app.get("port"));
+    console.info("server on port: ", this.app.get("port"));
   }
 }
 export const app = App.service
