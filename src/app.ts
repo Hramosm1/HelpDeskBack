@@ -11,13 +11,13 @@ import subCategorias from "./routes/subCategorias";
 import soporte from "./routes/personalDeSoporte";
 import tickets from "./routes/tickets";
 import comentarios from "./routes/comentariosTickets";
-import documentos from "./routes/documentos";
+//import documentos from "./routes/documentos";
 import usuarios from "./routes/usuarios"
 import supertest from "supertest";
 class App {
   private serv: http.Server
   app: Application = express();
-  io
+  io: Server
   private static instance: App
   private constructor() {
     this.settings();
