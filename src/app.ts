@@ -20,19 +20,23 @@ class App {
   io: Server
   private static instance: App
   private constructor() {
+    this.serv = http.createServer(this.app)
+    this.io = new Server(this.serv)
     this.settings();
     this.midlewares();
     this.routes();
-    this.serv = http.createServer(this.app)
-    this.io = new Server(this.serv)
+    this.sockets()
   }
   //configuraciones del servidor
   private settings(): void {
     this.app.set("port", process.env.PORT || 9411);
   }
+  private sockets() {
+    this.io.on('connection', cliente => console.log('cliente conectado'))
+  }
   //midlewares a implementar
   private midlewares(): void {
-    this.app.use(cors());
+    this.app.use(cors({ origin: '*', credentials: true }));
     this.app.use(json({ limit: '2mb' }));
     this.app.use(urlencoded({ extended: false }));
   }
