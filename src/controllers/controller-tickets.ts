@@ -3,10 +3,13 @@ import { prisma } from '../database'
 import { setQueryFromTickets } from '../core/utils';
 export class Tickets {
     async getAll(req: Request, res: Response) {
+        console.log(req.url, req.baseUrl)
         const take = Number(req.params.take)
         const page = Number(req.params.page)
         const skip = take * page
+        console.log(req.query)
         let where = setQueryFromTickets(req.query)
+        console.log(where)
         try {
             const tickets = await prisma.tickets.findMany({
                 select: {
