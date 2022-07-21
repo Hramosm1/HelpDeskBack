@@ -20,8 +20,9 @@ class App {
   io: Server
   private static instance: App
   private constructor() {
+
     this.serv = http.createServer(this.app)
-    this.io = new Server(this.serv)
+    this.io = new Server(this.serv, { cors: { origin: true } })
     this.settings();
     this.midlewares();
     this.routes();
@@ -32,11 +33,11 @@ class App {
     this.app.set("port", process.env.PORT || 9411);
   }
   private sockets() {
-    this.io.on('connection', cliente => console.log('cliente conectado'))
+    //this.io.on('nuevo-ticket', (cliente) => this.io.emit('notificacion', 'cliente'))
   }
   //midlewares a implementar
   private midlewares(): void {
-    this.app.use(cors({ origin: '*', credentials: true }));
+    this.app.use(cors({ origin: true, credentials: true }));
     this.app.use(json({ limit: '2mb' }));
     this.app.use(urlencoded({ extended: false }));
   }
