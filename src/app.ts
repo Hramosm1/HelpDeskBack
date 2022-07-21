@@ -20,7 +20,6 @@ class App {
   io: Server
   private static instance: App
   private constructor() {
-
     this.serv = http.createServer(this.app)
     this.io = new Server(this.serv, { cors: { origin: true } })
     this.settings();
