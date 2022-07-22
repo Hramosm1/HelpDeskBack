@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { BadRequest } from "http-errors"
 import { prisma } from '../database'
 import { setQueryFromTickets } from '../core/utils';
+import { uniq } from "lodash";
 import { app } from "../app";
 export class Tickets {
     async getAll(req: Request, res: Response, next: NextFunction) {
@@ -26,10 +27,10 @@ export class Tickets {
                 where,
                 orderBy: [{ activo: 'desc' }, { id: 'desc' }]
             })
-            const ids = tickets.map(({ solicitudDe }) => solicitudDe).join(',')
-            const users: any[] = await prisma.$queryRaw`SELECT id, nombre FROM Autenticacion.dbo.Usuarios u WHERE id in (${ids})`
+            const ids = uniq(tickets.map(({ solicitudDe }) => `'${solicitudDe}'`)).join(', ')
+            const users: any[] = await prisma.$queryRawUnsafe(`SELECT id, nombre FROM Autenticacion.dbo.Usuarios u WHERE id in (${ids})`)
             const rows = tickets.map(val => {
-                val.solicitudDe = users.find(us => us.id = val.solicitudDe)
+                val.solicitudDe = users.find(us => us.id === val.solicitudDe)
                 return val
             })
             const count = await prisma.tickets.count({ where })
