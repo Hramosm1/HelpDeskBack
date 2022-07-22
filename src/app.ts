@@ -11,27 +11,33 @@ import subCategorias from "./routes/subCategorias";
 import soporte from "./routes/personalDeSoporte";
 import tickets from "./routes/tickets";
 import comentarios from "./routes/comentariosTickets";
-import documentos from "./routes/documentos";
+//import documentos from "./routes/documentos";
+import usuarios from "./routes/usuarios"
+import supertest from "supertest";
 class App {
   private serv: http.Server
   app: Application = express();
-  io
+  io: Server
   private static instance: App
   private constructor() {
+    this.serv = http.createServer(this.app)
+    this.io = new Server(this.serv, { cors: { origin: true } })
     this.settings();
     this.midlewares();
     this.routes();
-    this.serv = http.createServer(this.app)
-    this.io = new Server(this.serv)
+    this.sockets()
   }
   //configuraciones del servidor
   private settings(): void {
-    this.app.set("port", 9411);
+    this.app.set("port", process.env.PORT || 9411);
+  }
+  private sockets() {
+    //this.io.on('nuevo-ticket', (cliente) => this.io.emit('notificacion', 'cliente'))
   }
   //midlewares a implementar
   private midlewares(): void {
-    this.app.use(cors());
-    this.app.use(json({ limit: '5mb' }));
+    this.app.use(cors({ origin: true, credentials: true }));
+    this.app.use(json({ limit: '2mb' }));
     this.app.use(urlencoded({ extended: false }));
   }
   //rutas
@@ -43,7 +49,8 @@ class App {
     this.app.use('/personalDeSoporte', soporte)
     this.app.use('/tickets', tickets)
     this.app.use('/comentarios', comentarios)
-    this.app.use('/documentos', documentos)
+    this.app.use('/usuarios', usuarios)
+    // this.app.use('/documentos', documentos)
   }
   public static get service() {
     return this.instance || (this.instance = new this())
@@ -51,7 +58,8 @@ class App {
   //funcion publica que inicia el servidor
   public async listen(): Promise<void> {
     await this.serv.listen(this.app.get("port"));
-    console.log("server on port: ", this.app.get("port"));
+    console.info("server on port: ", this.app.get("port"));
   }
 }
 export const app = App.service
+export const request = supertest(app.app) 
