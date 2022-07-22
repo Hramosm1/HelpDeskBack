@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response } from 'express'
 import { writeFileSync, existsSync, mkdirSync } from "fs";
 import sharp from "sharp";
 export class Documentos {

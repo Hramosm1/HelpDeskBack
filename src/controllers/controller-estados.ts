@@ -1,66 +1,57 @@
-import { Request, Response } from 'express'
-import { getPool } from '../database'
-import { Int } from 'mssql/msnodesqlv8'
+import { NextFunction, Request, Response } from 'express'
+import { BadRequest } from "http-errors"
 import { bodyEstados } from "../interfaces/interface-estados";
+import { prisma } from '../database';
 export class Estados {
-    async getAll(req: Request, res: Response) {
+    async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const pool = await getPool()
-            const result = await pool?.query('SELECT id, nombre from Estados WHERE activo = 1')
-            res.send(result?.recordsets[0])
-        } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
-        }
-    }
-    async getById(req: Request, res: Response) {
-        const { id } = req.params
-        try {
-            const pool = await getPool()
-            const request = pool?.request()
-            request?.input('id', Int, id)
-            const result = await request?.query('SELECT id, nombre, activo from Estados WHERE id = @id')
-            res.send(result?.recordset[0])
-        } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
-        }
-    }
-    async create(req: Request, res: Response) {
-        const body: bodyEstados = req.body
-        try {
-            const pool = await getPool()
-            const request = pool?.request()
-            request?.input('nombre', body.nombre)
-            const result = await request?.query('INSERT INTO Estados (nombre) VALUES (@nombre)')
-
+            const result = await prisma.estados.findMany({
+                select: { id: true, nombre: true },
+                where: { activo: true }
+            })
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
-    async editById(req: Request, res: Response) {
+    async getById(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params
-        const body: bodyEstados = req.body
         try {
-            const pool = await getPool()
-            const request = pool?.request()
-            request?.input('id', Int, id)
-            request?.input('nombre', body.nombre)
-            const result = await request?.query('UPDATE Estados SET nombre = @nombre WHERE id = @id')
+            const result = await prisma.estados.findFirst({
+                select: { id: true, nombre: true, activo: true },
+                where: { id: Number(id) }
+            })
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
-    async deleteById(req: Request, res: Response) {
-        const { id } = req.params
+    async create(req: Request, res: Response, next: NextFunction) {
+        const data: bodyEstados = req.body
         try {
-            const pool = await getPool()
-            const request = pool?.request()
-            request?.input('id', Int, id)
-            const result = await request?.query('UPDATE Estados SET activo = 0 WHERE id = @id')
+            const result = await prisma.estados.create({ data })
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
+        }
+    }
+    async editById(req: Request, res: Response, next: NextFunction) {
+        const { id } = req.params
+        const data: bodyEstados = req.body
+        try {
+            const result = await prisma.estados.update({ data, where: { id: Number(id) } })
+            res.send(result)
+        } catch (ex: any) {
+            next(new BadRequest(ex))
+        }
+    }
+    async deleteById(req: Request, res: Response, next: NextFunction) {
+        const { id } = req.params
+        try {
+            const result = await prisma.estados.update({ data: { activo: false }, where: { id: Number(id) } })
+            res.send(result)
+        } catch (ex: any) {
+            next(new BadRequest(ex))
         }
     }
 }

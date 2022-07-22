@@ -1,72 +1,57 @@
-import { Request, Response } from 'express'
-import { getPool } from '../database'
-import { Int } from 'mssql/msnodesqlv8'
+import { NextFunction, Request, Response } from 'express'
+import { BadRequest } from "http-errors"
+import { prisma } from '../database'
 import { bodyPrioridades } from "../interfaces/interface-prioridades";
 export class Prioridades {
-    async getAll(req: Request, res: Response) {
+    async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const pool = await getPool()
-            const result = await pool?.query('SELECT id, nombre, color from Prioridades WHERE activo = 1')
-
-            res.send(result?.recordsets[0])
-        } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
-        }
-    }
-    async getById(req: Request, res: Response) {
-        const { id } = req.params
-        try {
-            const pool = await getPool()
-            const request = pool?.request()
-            request?.input('id', Int, id)
-            const result = await request?.query('SELECT id, nombre, color, activo from Prioridades WHERE id = @id')
-
-            res.send(result?.recordset[0])
-        } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
-        }
-    }
-    async create(req: Request, res: Response) {
-        const body: bodyPrioridades = req.body
-        try {
-            const pool = await getPool()
-            const request = pool?.request()
-            request?.input('nombre', body.nombre),
-                request?.input('color', body.color)
-            const result = await request?.query('INSERT INTO Prioridades (nombre, color) VALUES (@nombre, @color)')
-
+            const result = await prisma.prioridades.findMany({
+                select: { id: true, nombre: true, color: true, activo: true },
+                where: { activo: true }
+            })
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
-    async editById(req: Request, res: Response) {
+    async getById(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params
-        const body: bodyPrioridades = req.body
         try {
-            const pool = await getPool()
-            const request = pool?.request()
-            request?.input('id', Int, id)
-            request?.input('nombre', body.nombre)
-            request?.input('color', body.color)
-            const result = await request?.query('UPDATE Prioridades SET nombre = @nombre, color = @color WHERE id = @id')
-
+            const result = await prisma.prioridades.findFirst({
+                select: { id: true, nombre: true, color: true, activo: true },
+                where: { id: Number(id) }
+            })
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
-    async deleteById(req: Request, res: Response) {
-        const { id } = req.params
+    async create(req: Request, res: Response, next: NextFunction) {
+        const data: bodyPrioridades = req.body
         try {
-            const pool = await getPool()
-            const request = pool?.request()
-            request?.input('id', Int, id)
-            const result = await request?.query('UPDATE Prioridades SET activo = 0 WHERE id = @id')
-
+            const result = await prisma.prioridades.create({ data })
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
+        }
+    }
+    async editById(req: Request, res: Response, next: NextFunction) {
+        const { id } = req.params
+        const data: bodyPrioridades = req.body
+        try {
+            const result = await prisma.prioridades.update({ data, where: { id: Number(id) } })
+            res.send(result)
+        } catch (ex: any) {
+            next(new BadRequest(ex))
+        }
+    }
+    async deleteById(req: Request, res: Response, next: NextFunction) {
+        const { id } = req.params
+        try {
+            const result = await prisma.prioridades.update({ data: { activo: false }, where: { id: Number(id) } })
+            res.send(result)
+        } catch (ex: any) {
+            next(new BadRequest(ex))
         }
     }
 }

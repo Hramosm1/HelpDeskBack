@@ -1,52 +1,24 @@
-import { Request, Response } from 'express'
-import { getPool } from '../database'
-import { Int, MAX, UniqueIdentifier, VarChar } from 'mssql/msnodesqlv8'
+import { NextFunction, Request, Response } from 'express'
+import { BadRequest } from "http-errors"
+import { prisma } from "../database";
 export class Comentariostickets {
 
-    async getById(req: Request, res: Response) {
+    async getById(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params
         try {
-            const pool = await getPool()
-            const request = pool?.request()
-            request?.input('id', Int, id)
-            const result = await request?.query('SELECT id, nombre, usuario, idTicket, idUsuario, fecha, comentario FROM VW_Comentarios WHERE idTicket = @id ORDER BY fecha ASC')
-            res.send(result?.recordset)
-        } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
-        }
-    }
-    async create(req: Request, res: Response) {
-        const { ticket, usuario, comentario } = req.body
-        try {
-            const pool = await getPool()
-            const request = pool?.request()
-            request?.input('ticket', Int, ticket)
-            request?.input('usuario', UniqueIdentifier, usuario)
-            request?.input('comentario', VarChar(MAX), comentario)
-            const result = await request?.query('INSERT INTO Comentarios (idTicket, idUsuario, comentario) VALUES (@ticket, @usuario, @comentario)')
+            const result = await prisma.$queryRaw`SELECT id, nombre, usuario, idTicket, idUsuario, fecha, comentario FROM VW_Comentarios WHERE idTicket = ${id} ORDER BY fecha ASC`
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
-    /*async editById(req: Request, res: Response) {
-        const pool = await getPool()
-        const { id } = req.params
+    async create(req: Request, res: Response, next: NextFunction) {
+        const data = req.body
         try {
-            const request = pool.request()
-            request.input('id', Int, id)
+            const result = await prisma.comentarios.create({ data })
+            res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
-    async deleteById(req: Request, res: Response) {
-        const pool = await getPool()
-        const { id } = req.params
-        try {
-            const request = pool.request()
-            request.input('id', Int, id)
-        } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
-        }
-    }*/
 }
