@@ -3,26 +3,16 @@ export function setQueryFromTickets(query: any): Prisma.TicketsWhereInput {
   let AND: Prisma.Enumerable<Prisma.TicketsWhereInput> = []
   for (const key in query) {
     switch (key) {
-      case 'PersonalDeSoporte':
-        AND.push({ PersonalDeSoporte: { idUsuario: { in: query[key] } } })
-        break;
-      case 'asignadoA':
-        query[key] = Array.isArray(query[key]) ? query[key] : [query[key]]
-        AND.push({ [key]: { in: query[key].map((id: string) => Number(id)) } })
-        break;
       case 'id':
         AND.push({ [key]: { equals: Number(query[key]) } })
         break;
       case 'titulo':
         AND.push({ [key]: { contains: query[key] } })
         break;
-      case 'desde':
-        AND.push({ fechaSolicitud: { gte: query[key] } })
+      case 'solicitudDe':
+        AND.push({ [key]: { in: query[key] } })
         break;
-      case 'hasta':
-        AND.push({ fechaSolicitud: { lte: query[key] } })
-        break;
-      case 'idEstado':
+      case 'asignadoA':
         query[key] = Array.isArray(query[key]) ? query[key] : [query[key]]
         AND.push({ [key]: { in: query[key].map((id: string) => Number(id)) } })
         break;
@@ -30,11 +20,20 @@ export function setQueryFromTickets(query: any): Prisma.TicketsWhereInput {
         query[key] = Array.isArray(query[key]) ? query[key] : [query[key]]
         AND.push({ [key]: { in: query[key].map((id: string) => Number(id)) } })
         break;
+      case 'idEstado':
+        query[key] = Array.isArray(query[key]) ? query[key] : [query[key]]
+        AND.push({ [key]: { in: query[key].map((id: string) => Number(id)) } })
+        break;
+      case 'desde':
+        AND.push({ fechaSolicitud: { gte: query[key] } })
+        break;
+      case 'hasta':
+        AND.push({ fechaSolicitud: { lte: query[key] } })
+        break;
       case 'activo':
         AND.push({ [key]: { equals: query[key] === 'true' ? true : false } })
         break;
       default:
-        AND.push({ [key]: { in: query[key] } })
         break;
     }
   }

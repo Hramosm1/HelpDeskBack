@@ -1,15 +1,15 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
+import { BadRequest } from "http-errors"
 import { prisma } from '../database'
 import { setQueryFromTickets } from '../core/utils';
+import { uniq } from "lodash";
+import { app } from "../app";
 export class Tickets {
-    async getAll(req: Request, res: Response) {
-        console.log(req.url, req.baseUrl)
+    async getAll(req: Request, res: Response, next: NextFunction) {
         const take = Number(req.params.take)
         const page = Number(req.params.page)
         const skip = take * page
-        console.log(req.query)
         let where = setQueryFromTickets(req.query)
-        console.log(where)
         try {
             const tickets = await prisma.tickets.findMany({
                 select: {
@@ -27,19 +27,19 @@ export class Tickets {
                 where,
                 orderBy: [{ activo: 'desc' }, { id: 'desc' }]
             })
-            const ids = tickets.map(({ solicitudDe }) => solicitudDe).join(',')
-            const users: any[] = await prisma.$queryRaw`SELECT id, nombre FROM Autenticacion.dbo.Usuarios u WHERE id in (${ids})`
+            const ids = uniq(tickets.map(({ solicitudDe }) => `'${solicitudDe}'`)).join(', ')
+            const users: any[] = await prisma.$queryRawUnsafe(`SELECT id, nombre FROM Autenticacion.dbo.Usuarios u WHERE id in (${ids})`)
             const rows = tickets.map(val => {
-                val.solicitudDe = users.find(us => us.id = val.solicitudDe)
+                val.solicitudDe = users.find(us => us.id === val.solicitudDe)
                 return val
             })
             const count = await prisma.tickets.count({ where })
             res.send({ count, rows })
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
-    async getById(req: Request, res: Response) {
+    async getById(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params
         let result
         try {
@@ -57,10 +57,10 @@ export class Tickets {
             }
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
-    async create(req: Request, res: Response) {
+    async create(req: Request, res: Response, next: NextFunction) {
         const { titulo, descripcion, prioridad, estado, categorias, solicitudDe, asignadoA } = req.body
         const ncategorias = categorias.map((id: number) => ({ idSubCategoria: id }))
         try {
@@ -75,29 +75,31 @@ export class Tickets {
                     CategoriasPorTickets: { createMany: { data: ncategorias } }
                 }
             })
+            app.io.emit('nuevoTicket')
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next
+            next(new BadRequest(ex))
         }
     }
-    async cerrarTicket(req: Request, res: Response) {
+    async cerrarTicket(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params
         const data = req.body
         try {
             const result = await prisma.tickets.update({ data, where: { id: Number(id) } })
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
-    async editById(req: Request, res: Response) {
+    async editById(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params
         const data = req.body
         try {
             const result = await prisma.tickets.update({ data, where: { id: Number(id) } })
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
 }

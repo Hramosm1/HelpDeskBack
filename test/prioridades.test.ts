@@ -23,29 +23,16 @@ describe('GET /prioridades/:id', () => {
 
 //POST
 describe('POST /prioridades', () => {
-  test('Filas afectadas son mayor que 0', async () => {
+  test('Crea una prioridad', async () => {
     const body: bodyPrioridades = { nombre: 'prueba jest', color: "jest" }
     const result = await request.post('/prioridades').send(body)
-    expect(result.body.rowsAffected[0]).toBeGreaterThan(0)
-  })
-  test('Verifica que se haya creado', async () => {
-    const last = await request.get('/prioridades')
-    if (Array.isArray(last.body)) {
-      const content: Array<iPrioridad> = last.body
-      const id: number | undefined = content.find(val => val.nombre === 'prueba jest')?.id
-      if (id) {
-        const bodyExpect: iPrioridad = { id, nombre: 'prueba jest', color: 'jest', activo: true }
-        const result = await request.get(`/prioridades/${id}`)
-        expect(result.body).toMatchObject(bodyExpect)
-      }
-    }
-    else expect(false).toBe(true)
+    expect(result.statusCode).toBe(200)
   })
 })
 
 //PUT
 describe('POST /prioridades', () => {
-  test('Filas afectadas son mayor que 0', async () => {
+  test('Edita la prioridad', async () => {
     const last = await request.get('/prioridades')
     if (Array.isArray(last.body)) {
       const content: Array<iPrioridad> = last.body
@@ -53,20 +40,7 @@ describe('POST /prioridades', () => {
       if (id) {
         const body: bodyPrioridades = { nombre: 'prueba jest', color: "editado" }
         const result = await request.put(`/prioridades/${id}`).send(body)
-        expect(result.body.rowsAffected[0]).toBeGreaterThan(0)
-      }
-    }
-    else expect(false).toBe(true)
-  })
-  test('Verifica que se haya editado', async () => {
-    const last = await request.get('/prioridades')
-    if (Array.isArray(last.body)) {
-      const content: Array<iPrioridad> = last.body
-      const id: number | undefined = content.find(val => val.nombre === 'prueba jest')?.id
-      if (id) {
-        const bodyExpect: iPrioridad = { id, nombre: 'prueba jest', color: 'editado', activo: true }
-        const result = await request.get(`/prioridades/${id}`)
-        expect(result.body).toMatchObject(bodyExpect)
+        expect(result.statusCode).toBe(200)
       }
     }
     else expect(false).toBe(true)
@@ -75,14 +49,14 @@ describe('POST /prioridades', () => {
 
 //DELETE
 describe('DELETE /prioridades/:id', () => {
-  test('Filas afectadas son mayor que 0', async () => {
+  test('Elimina la prioridad', async () => {
     const last = await request.get('/prioridades')
     if (Array.isArray(last.body)) {
       const content: Array<iPrioridad> = last.body
       const id: number | undefined = content.find(val => val.nombre === 'prueba jest')?.id
       if (id) {
         const result = await request.delete(`/prioridades/${id}`)
-        expect(result.body.rowsAffected[0]).toBeGreaterThan(0)
+        expect(result.statusCode).toBe(200)
       }
     }
     else expect(false).toBe(true)

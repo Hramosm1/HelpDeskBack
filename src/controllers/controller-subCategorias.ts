@@ -1,8 +1,9 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
+import { BadRequest } from "http-errors"
 import { prisma } from '../database'
 import { bodySubcategoria } from '../interfaces/interface-subCategorias'
 export class Subcategorias {
-    async getAll(req: Request, res: Response) {
+    async getAll(req: Request, res: Response, next: NextFunction) {
         try {
             const result = await prisma.subCategorias.findMany({
                 select: {
@@ -13,10 +14,10 @@ export class Subcategorias {
             })
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
-    async getById(req: Request, res: Response) {
+    async getById(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params
         try {
             const result = await prisma.subCategorias.findMany({
@@ -30,35 +31,35 @@ export class Subcategorias {
             })
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
-    async create(req: Request, res: Response) {
+    async create(req: Request, res: Response, next: NextFunction) {
         const data: bodySubcategoria = req.body
         try {
             const result = await prisma.subCategorias.create({ data })
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
-    async editById(req: Request, res: Response) {
+    async editById(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params
         const data: bodySubcategoria = req.body
         try {
             const result = await prisma.subCategorias.update({ data, where: { id: Number(id) } })
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
-    async deleteById(req: Request, res: Response) {
+    async deleteById(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params
         try {
             const result = await prisma.subCategorias.update({ data: { activo: false }, where: { id: Number(id) } })
             res.send(result)
         } catch (ex: any) {
-            res.status(404).send({ message: 'error en la consulta', error: ex.message })
+            next(new BadRequest(ex))
         }
     }
 }
