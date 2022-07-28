@@ -9,6 +9,12 @@ export class Subcategorias {
                 select: {
                     id: true,
                     nombre: true,
+                    Categorias: {
+                        select: {
+                            id: true,
+                            nombre: true
+                        }
+                    }
                 },
                 where: { activo: true }
             })
