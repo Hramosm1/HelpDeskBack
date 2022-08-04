@@ -21,6 +21,11 @@ export class Tickets {
                     Prioridades: { select: { nombre: true, color: true } },
                     Estados: { select: { nombre: true } },
                     PersonalDeSoporte: { select: { idUsuario: true, nombre: true } },
+                    Comentarios: {
+                        select: {
+                            id: true
+                        }
+                    }
                 },
                 take,
                 skip,
@@ -30,8 +35,10 @@ export class Tickets {
             const ids = uniq(tickets.map(({ solicitudDe }) => `'${solicitudDe}'`)).join(', ')
             const users: any[] = await prisma.$queryRawUnsafe(`SELECT id, nombre FROM Autenticacion.dbo.Usuarios u WHERE id in (${ids})`)
             const rows = tickets.map(val => {
-                val.solicitudDe = users.find(us => us.id === val.solicitudDe)
-                return val
+                let newRow: any = val
+                newRow.solicitudDe = users.find(us => us.id === val.solicitudDe)
+                newRow.Comentarios = val.Comentarios.length
+                return newRow
             })
             const count = await prisma.tickets.count({ where })
             res.send({ count, rows })
