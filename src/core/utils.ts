@@ -40,3 +40,21 @@ export function setQueryFromTickets(query: any): Prisma.TicketsWhereInput {
   const where: Prisma.TicketsWhereInput = { AND }
   return where
 }
+export function GetPrismaFilterByMonth(dateColumnName: string, numberOfMonth: number) {
+  if (numberOfMonth) {
+    const month = Number(numberOfMonth) - 1
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), month, 1)
+    const lastDay = new Date(now.getFullYear(), month + 1, 0)
+    return {
+      AND: [
+        { [dateColumnName]: { gte: firstDay } },
+        { [dateColumnName]: { lte: lastDay } }
+      ]
+    }
+
+  } else {
+    return {}
+  }
+
+}

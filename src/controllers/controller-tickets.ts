@@ -85,15 +85,27 @@ export class Tickets {
             app.io.emit('nuevoTicket')
             res.send(result)
         } catch (ex: any) {
-            next
             next(new BadRequest(ex))
         }
     }
     async cerrarTicket(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params
-        const data = req.body
+        const { comentario, idEstado, idUsuario, activo } = req.body
         try {
-            const result = await prisma.tickets.update({ data, where: { id: Number(id) } })
+            const result = await prisma.tickets.update({
+                data: { idEstado, activo },
+                where: {
+                    id: Number(id)
+                }
+            })
+            const resultComentario = await prisma.comentarios.create({
+                data: {
+                    comentario,
+                    idUsuario,
+                    idTicket: Number(id),
+                    ComentarioDeCierre: true
+                }
+            })
             res.send(result)
         } catch (ex: any) {
             next(new BadRequest(ex))
