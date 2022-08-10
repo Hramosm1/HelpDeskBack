@@ -7,7 +7,7 @@ export class Comentariostickets {
     async getById(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params
         try {
-            const result = await prisma.$queryRaw`SELECT id, nombre, usuario, idTicket, idUsuario, fecha, comentario FROM VW_Comentarios WHERE idTicket = ${id} ORDER BY fecha ASC`
+            const result = await prisma.$queryRaw`SELECT * FROM VW_Comentarios WHERE idTicket = ${id} ORDER BY fecha ASC`
             res.send(result)
         } catch (ex: any) {
             next(new BadRequest(ex))

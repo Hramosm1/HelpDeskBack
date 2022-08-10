@@ -11,6 +11,7 @@ import subCategorias from "./routes/subCategorias";
 import soporte from "./routes/personalDeSoporte";
 import tickets from "./routes/tickets";
 import comentarios from "./routes/comentariosTickets";
+import dashboard from "./routes/dashboard"
 //import documentos from "./routes/documentos";
 import usuarios from "./routes/usuarios"
 import supertest from "supertest";
@@ -50,6 +51,7 @@ class App {
     this.app.use('/tickets', tickets)
     this.app.use('/comentarios', comentarios)
     this.app.use('/usuarios', usuarios)
+    this.app.use('/dashboard', dashboard)
     // this.app.use('/documentos', documentos)
   }
   public static get service() {
