@@ -79,7 +79,6 @@ export class Dashboard {
         for (const key in omitiendoTicketsNoCerrados) {
           if (Object.prototype.hasOwnProperty.call(omitiendoTicketsNoCerrados, key)) {
             const val = omitiendoTicketsNoCerrados[key];
-            console.table(val)
             const fechaCreacion = val[0].fecha!.getTime()
             const fechaCierre = val[1].fecha!.getTime()
             const tiempoAbierto = Math.floor((fechaCierre - fechaCreacion) / (1000))
