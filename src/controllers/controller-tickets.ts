@@ -21,6 +21,11 @@ export class Tickets {
                     Prioridades: { select: { nombre: true, color: true } },
                     Estados: { select: { nombre: true } },
                     PersonalDeSoporte: { select: { idUsuario: true, nombre: true } },
+                    Comentarios: {
+                        select: {
+                            id: true
+                        }
+                    }
                 },
                 take,
                 skip,
@@ -30,8 +35,10 @@ export class Tickets {
             const ids = uniq(tickets.map(({ solicitudDe }) => `'${solicitudDe}'`)).join(', ')
             const users: any[] = await prisma.$queryRawUnsafe(`SELECT id, nombre FROM Autenticacion.dbo.Usuarios u WHERE id in (${ids})`)
             const rows = tickets.map(val => {
-                val.solicitudDe = users.find(us => us.id === val.solicitudDe)
-                return val
+                let newRow: any = val
+                newRow.solicitudDe = users.find(us => us.id === val.solicitudDe)
+                newRow.Comentarios = val.Comentarios.length
+                return newRow
             })
             const count = await prisma.tickets.count({ where })
             res.send({ count, rows })
@@ -78,15 +85,27 @@ export class Tickets {
             app.io.emit('nuevoTicket')
             res.send(result)
         } catch (ex: any) {
-            next
             next(new BadRequest(ex))
         }
     }
     async cerrarTicket(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params
-        const data = req.body
+        const { comentario, idEstado, idUsuario, activo } = req.body
         try {
-            const result = await prisma.tickets.update({ data, where: { id: Number(id) } })
+            const result = await prisma.tickets.update({
+                data: { idEstado, activo },
+                where: {
+                    id: Number(id)
+                }
+            })
+            const resultComentario = await prisma.comentarios.create({
+                data: {
+                    comentario,
+                    idUsuario,
+                    idTicket: Number(id),
+                    ComentarioDeCierre: true
+                }
+            })
             res.send(result)
         } catch (ex: any) {
             next(new BadRequest(ex))

@@ -15,6 +15,10 @@ describe('GET /tickets/:take/:page', () => {
     const result = await request.get('/tickets/4/0')
     expect(result.body.rows).toBeDefined()
   })
+  it('El body contiene comentarios cantidad de comentarios', async () => {
+    const result = await request.get('/tickets/1/0')
+    expect(typeof result.body.rows[0].Comentarios).toBe('number')
+  })
   it('Regresa un array', async () => {
     const result = await request.get('/tickets/4/0')
     expect(result.body.rows).toBeInstanceOf(Array)
@@ -23,6 +27,7 @@ describe('GET /tickets/:take/:page', () => {
     const result = await request.get('/tickets/4/0')
     expect(result.body.rows.length).toBe(4)
   })
+
 })
 describe('GET /tickets/:take/:page?query', () => {
 
