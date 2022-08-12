@@ -5,7 +5,7 @@ export const documentoPorTicketModel = z.object({
   id: z.string().optional(),
   idTicket: z.number().int(),
   enlace: z.string(),
-  tipoDocumento: z.string().nullish().optional(),
+  tipoDocumento: z.string().nullish(),
 })
 
 export interface CompleteDocumentoPorTicket extends z.infer<typeof documentoPorTicketModel> {

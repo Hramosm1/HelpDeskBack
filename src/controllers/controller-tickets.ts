@@ -83,7 +83,7 @@ export class Tickets {
                 }
             })
             app.io.emit('nuevoTicket')
-            res.send(result)
+            res.status(201).send(result)
         } catch (ex: any) {
             next(new BadRequest(ex))
         }

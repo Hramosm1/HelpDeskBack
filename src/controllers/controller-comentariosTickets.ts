@@ -24,7 +24,7 @@ export class Comentariostickets {
             const data = comentariosModel.parse(req.body)
             const result = await prisma.comentarios.create({ data })
             app.io.emit('nuevoComentario', null)
-            res.send(result)
+            res.status(201).send(result)
         } catch (ex: any) {
             next(new BadRequest(ex))
         }

@@ -31,7 +31,7 @@ export class Estados {
         try {
             const data = estadosModel.parse(req.body)
             const result = await prisma.estados.create({ data })
-            res.send(result)
+            res.status(201).send(result)
         } catch (ex: any) {
             next(new BadRequest(ex))
         }

@@ -31,7 +31,7 @@ export class Prioridades {
         try {
             const data = prioridadesModel.parse(req.body)
             const result = await prisma.prioridades.create({ data })
-            res.send(result)
+            res.status(201).send(result)
         } catch (ex: any) {
             next(new BadRequest(ex))
         }

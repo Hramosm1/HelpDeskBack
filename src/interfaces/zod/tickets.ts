@@ -4,9 +4,9 @@ import { CompletePersonalDeSoporte, relatedPersonalDeSoporteModel, CompleteEstad
 export const ticketsModel = z.object({
   id: z.number().int().optional(),
   titulo: z.string(),
-  descripcion: z.string().nullish().optional(),
+  descripcion: z.string().nullish(),
   solicitudDe: z.string(),
-  asignadoA: z.number().int().nullish().optional(),
+  asignadoA: z.number().int().nullish(),
   idPrioridad: z.number().int(),
   idEstado: z.number().int(),
   fechaSolicitud: z.date().nullish().optional(),
@@ -30,7 +30,7 @@ export interface CompleteTickets extends z.infer<typeof ticketsModel> {
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
 export const relatedTicketsModel: z.ZodSchema<CompleteTickets> = z.lazy(() => ticketsModel.extend({
-  PersonalDeSoporte: relatedPersonalDeSoporteModel.nullish().optional(),
+  PersonalDeSoporte: relatedPersonalDeSoporteModel.nullish(),
   Estados: relatedEstadosModel,
   Prioridades: relatedPrioridadesModel,
   CategoriasPorTickets: relatedCategoriasPorTicketsModel.array(),

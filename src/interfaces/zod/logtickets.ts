@@ -6,7 +6,7 @@ export const logTicketsModel = z.object({
   idTicket: z.number().int(),
   idEstado: z.number().int(),
   idUsuarioAccion: z.string(),
-  idUsuarioAsignado: z.number().int().nullish().optional(),
+  idUsuarioAsignado: z.number().int().nullish(),
   accion: z.string(),
   fecha: z.date().nullish().optional(),
 })
@@ -25,5 +25,5 @@ export interface CompletelogTickets extends z.infer<typeof logTicketsModel> {
 export const relatedlogTicketsModel: z.ZodSchema<CompletelogTickets> = z.lazy(() => logTicketsModel.extend({
   Estados: relatedEstadosModel,
   Tickets: relatedTicketsModel,
-  PersonalDeSoporte: relatedPersonalDeSoporteModel.nullish().optional(),
+  PersonalDeSoporte: relatedPersonalDeSoporteModel.nullish(),
 }))

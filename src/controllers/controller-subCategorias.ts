@@ -45,7 +45,7 @@ export class Subcategorias {
         try {
             const data = subCategoriasModel.parse(req.body)
             const result = await prisma.subCategorias.create({ data })
-            res.send(result)
+            res.status(201).send(result)
         } catch (ex: any) {
             next(new BadRequest(ex))
         }

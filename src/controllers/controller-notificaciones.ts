@@ -17,7 +17,7 @@ export class Notificaciones {
       const result = await prisma.tiposNotificacion.create({
         data
       })
-      res.status(201).send(data)
+      res.status(201).send(result)
     } catch (ex: any) {
       next(new BadRequest(ex))
     }

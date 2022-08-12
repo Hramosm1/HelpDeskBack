@@ -25,7 +25,7 @@ export class Personaldesoporte {
         try {
             const data = personalDeSoporteModel.parse(req.body)
             const result = await prisma.personalDeSoporte.create({ data })
-            res.send(result)
+            res.status(201).send(result)
         } catch (ex: any) {
             next(new BadRequest(ex))
         }
