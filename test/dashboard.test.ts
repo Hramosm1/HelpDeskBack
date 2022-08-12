@@ -1,46 +1,24 @@
 import { request } from "../src/app";
-describe('GET /dashboard/:mes', () => {
-  it('Recibe total de tickets creados por mes', async () => {
-    const result = await request.get('/dashboard')
+describe('GET /dashboard', () => {
+  const mes = new Date().getMonth() + 1
+  test.concurrent('Recibe total de tickets creados por mes', async () => {
+    const result = await request.get('/dashboard/stats/' + mes)
     expect(result.body.ticketsCreados).toBeDefined()
   })
-  it('Recibe total de tickets cerrados por mes', async () => {
-    const result = await request.get('/dashboard')
+  test.concurrent('Recibe total de tickets cerrados por mes', async () => {
+    const result = await request.get('/dashboard/stats/' + mes)
     expect(result.body.ticketCerrados).toBeDefined()
   })
-  it('Recibe tabla tickets asignados por mes', async () => {
-    const result = await request.get('/dashboard')
-    expect(result.statusCode).toBe(200)
+  test.concurrent('Recibe listado de tickets asignados a personal de soporte', async () => {
+    const result = await request.get('/dashboard/stats/' + mes)
+    expect(result.body.personalDeSoporte).toBeDefined()
   })
-})/*
-describe('GET /dashboard/:mes', () => {
-  it('Recibe total de tickets creados por mes', async () => {
-    const result = await request.get('/dashboard')
-    expect(result.body.ticketsCreados).toBeDefined()
+  test.concurrent('Recibe listado de tiempos por ticket', async () => {
+    const result = await request.get('/dashboard/average/' + mes)
+    expect(result.body).toBeInstanceOf(Array)
   })
-  it('Recibe total de tickets cerrados por mes', async () => {
-    const result = await request.get('/dashboard')
-    expect(result.body.ticketCerrados).toBeDefined()
-  })
-  it('Recibe tabla tickets asignados por mes', async () => {
-    const result = await request.get('/dashboard')
-    expect(result.statusCode).toBe(200)
+  test.concurrent('Recibe listado de tickets creados y eliminados por dia', async () => {
+    const result = await request.get('/dashboard/graph/' + mes)
+    expect(result.body).toBeInstanceOf(Array)
   })
 })
-
-describe('GET /dashboard/:mes', () => {
-  it('Recibe total de tickets creados por mes', async () => {
-    const result = await request.get('/dashboard')
-    expect(result.body.ticketsCreados).toBeDefined()
-  })
-  it('Recibe total de tickets cerrados por mes', async () => {
-    const result = await request.get('/dashboard')
-    expect(result.body.ticketCerrados).toBeDefined()
-  })
-  it('Recibe tabla tickets asignados por mes', async () => {
-    const result = await request.get('/dashboard')
-    expect(result.statusCode).toBe(200)
-  })
-})
-
-*/
