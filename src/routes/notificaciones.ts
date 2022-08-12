@@ -3,6 +3,6 @@ import { Notificaciones } from '../controllers/controller-notificaciones'
 const controller = new Notificaciones()
 const router = Router()
 
-router.get('/')
+router.post('/tipos', controller.createTiposNotificacion)
 
 export default router

@@ -3,6 +3,7 @@ import express, { Application, json, urlencoded } from "express";
 import cors from "cors";
 import http from 'http';
 import { Server } from 'socket.io'
+//middlewares
 //importacion de rutas
 import estados from './routes/estados';
 import categorias from "./routes/categorias";

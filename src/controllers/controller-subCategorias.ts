@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { BadRequest } from "http-errors"
 import { prisma } from '../database'
 import { bodySubcategoria } from '../interfaces/interface-subCategorias'
+import { subCategoriasModel } from '../interfaces/zod'
 export class Subcategorias {
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
@@ -41,8 +42,8 @@ export class Subcategorias {
         }
     }
     async create(req: Request, res: Response, next: NextFunction) {
-        const data: bodySubcategoria = req.body
         try {
+            const data = subCategoriasModel.parse(req.body)
             const result = await prisma.subCategorias.create({ data })
             res.send(result)
         } catch (ex: any) {

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { BadRequest } from "http-errors"
 import { prisma } from '../database'
 import { bodyPersonalDeSoporte } from '../interfaces/interface-personalDeSoporte'
+import { personalDeSoporteModel } from '../interfaces/zod'
 export class Personaldesoporte {
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
@@ -21,8 +22,8 @@ export class Personaldesoporte {
         }
     }
     async create(req: Request, res: Response, next: NextFunction) {
-        const data: bodyPersonalDeSoporte = req.body
         try {
+            const data = personalDeSoporteModel.parse(req.body)
             const result = await prisma.personalDeSoporte.create({ data })
             res.send(result)
         } catch (ex: any) {
