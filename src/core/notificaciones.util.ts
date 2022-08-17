@@ -21,19 +21,29 @@ export class NotificationsUtil {
     app.io.emit('notificacion', null)
   }
   static async createNotificationForAsignation(asignadoA: number, id: number) {
+    const listOfUsers = await this.getListOfUsers(3)
     const usuario = await prisma.personalDeSoporte.findUnique({
-      select: { idUsuario: true },
+      select: { idUsuario: true, nombre: true },
       where: { id: asignadoA! }
     })
-    const data = {
-      idUsuario: usuario?.idUsuario!,
+    const listWithoutPersonalUser = listOfUsers.filter(({ idUsuario }) => idUsuario != usuario?.idUsuario)
+    const data = listWithoutPersonalUser.map(({ idUsuario }) => ({
+      idUsuario,
       titulo: 'Ticket asignado',
-      descripcion: `Se te ha asignado el ticket ${id}`,
+      descripcion: `El ticket No:${id} fue asignado a ${usuario?.nombre}`,
       redirecciona: true,
       link: `tickets/${id}`,
       icono: 'heroicons_solid:user'
-    }
-    await prisma.notificaciones.create({ data })
+    }))
+    data.push({
+      idUsuario: usuario?.idUsuario!,
+      titulo: 'Ticket asignado',
+      descripcion: `Se te ha asignado el ticket No:${id}`,
+      redirecciona: true,
+      link: `tickets/${id}`,
+      icono: 'heroicons_solid:user'
+    })
+    await prisma.notificaciones.createMany({ data })
     app.io.emit('notificacion', null)
   }
   static async createNotificationForComent(idTicket: number, idUsuarioComentario: string) {
