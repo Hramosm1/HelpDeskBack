@@ -3,6 +3,7 @@ import { BadRequest } from "http-errors"
 import { prisma } from "../database";
 import { app } from '../app'
 import { comentariosModel } from '../interfaces/zod';
+import { NotificationsUtil } from '../core/notificaciones.util';
 export class Comentariostickets {
 
     async getById(req: Request, res: Response, next: NextFunction) {
@@ -23,6 +24,7 @@ export class Comentariostickets {
         try {
             const data = comentariosModel.parse(req.body)
             const result = await prisma.comentarios.create({ data })
+            await NotificationsUtil.createNotificationForComent(data.idTicket, data.idUsuario)
             app.io.emit('nuevoComentario', null)
             res.status(201).send(result)
         } catch (ex: any) {

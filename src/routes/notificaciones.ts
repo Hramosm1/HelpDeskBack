@@ -6,8 +6,8 @@ const router = Router()
 router.get('/', controller.getNotificaciones)
 router.post('/', controller.createNotificacion)
 router.get('/porRol', controller.getNotificacionesPorRol)
-router.put('/porRol', controller.updateNotificacionesPorRol)
+router.put('/porRol/:id', controller.updateNotificacionesPorRol)
 router.get('/tipos', controller.getTiposNotificacion)
-router.post('/tipos', controller.createTiposNotificacion)
+router.post('/tipos/:id', controller.createTiposNotificacion)
 
 export default router

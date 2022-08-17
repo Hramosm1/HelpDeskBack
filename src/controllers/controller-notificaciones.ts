@@ -17,9 +17,7 @@ export class Notificaciones {
   createTiposNotificacion: Handler = async (req, res, next) => {
     try {
       const data = tiposNotificacionModel.parse(req.body)
-      const result = await prisma.tiposNotificacion.create({
-        data
-      })
+      const result = await prisma.tiposNotificacion.create({ data })
       res.status(201).send(result)
     } catch (ex: any) {
       next(new BadRequest(ex))
@@ -27,8 +25,8 @@ export class Notificaciones {
   }
   getNotificacionesPorRol: Handler = async (req, res, next) => {
     try {
-      const result = await prisma
-        .$queryRaw`SELECT 
+      const result = await prisma.$queryRaw`
+                  SELECT 
                     npr.id, 
                     npr.idRol,
                     r.nombre rol,
@@ -48,7 +46,12 @@ export class Notificaciones {
   }
   updateNotificacionesPorRol: Handler = async (req, res, next) => {
     try {
-
+      const id = Number(req.params.id)
+      const { activo } = req.body
+      const data = { activo }
+      const result = await prisma.notificacionesPorRol
+        .update({ data, where: { id } })
+      res.send(result)
     } catch (ex: any) {
       next(new BadRequest(ex))
     }

@@ -4,6 +4,7 @@ import { prisma } from '../database'
 import { setQueryFromTickets } from '../core/utils';
 import { uniq } from "lodash";
 import { app } from "../app";
+import { NotificationsUtil } from '../core/notificaciones.util';
 export class Tickets {
     async getAll(req: Request, res: Response, next: NextFunction) {
         const take = Number(req.params.take)
@@ -71,7 +72,7 @@ export class Tickets {
         const { titulo, descripcion, prioridad, estado, categorias, solicitudDe, asignadoA } = req.body
         const ncategorias = categorias.map((id: number) => ({ idSubCategoria: id }))
         try {
-            const result = await prisma.tickets.create({
+            const ticket = await prisma.tickets.create({
                 data: {
                     titulo,
                     descripcion,
@@ -82,8 +83,12 @@ export class Tickets {
                     CategoriasPorTickets: { createMany: { data: ncategorias } }
                 }
             })
+            await NotificationsUtil
+                .createNotificationForNewTicket(ticket.titulo, ticket.id, ticket.solicitudDe)
+            if (ticket.asignadoA) await NotificationsUtil
+                .createNotificationForAsignation(ticket.asignadoA, ticket.id)
             app.io.emit('nuevoTicket')
-            res.status(201).send(result)
+            res.status(201).send(ticket)
         } catch (ex: any) {
             next(new BadRequest(ex))
         }
@@ -92,13 +97,13 @@ export class Tickets {
         const { id } = req.params
         const { comentario, idEstado, idUsuario, activo } = req.body
         try {
-            const result = await prisma.tickets.update({
+            const ticket = await prisma.tickets.update({
                 data: { idEstado, activo },
                 where: {
                     id: Number(id)
                 }
             })
-            const resultComentario = await prisma.comentarios.create({
+            await prisma.comentarios.create({
                 data: {
                     comentario,
                     idUsuario,
@@ -106,7 +111,9 @@ export class Tickets {
                     ComentarioDeCierre: true
                 }
             })
-            res.send(result)
+            if (!ticket.activo) await NotificationsUtil
+                .createNotificationForTicketCloset(idUsuario, Number(id))
+            res.send(ticket)
         } catch (ex: any) {
             next(new BadRequest(ex))
         }
@@ -116,6 +123,8 @@ export class Tickets {
         const data = req.body
         try {
             const result = await prisma.tickets.update({ data, where: { id: Number(id) } })
+            if (data.solicitudDe) await NotificationsUtil
+                .createNotificationForAsignation(data.solicitudDe, Number(id))
             res.send(result)
         } catch (ex: any) {
             next(new BadRequest(ex))
