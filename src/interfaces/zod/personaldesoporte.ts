@@ -5,6 +5,7 @@ export const personalDeSoporteModel = z.object({
   id: z.number().int().optional(),
   idUsuario: z.string(),
   nombre: z.string().nullish(),
+  activo: z.boolean().nullish().optional(),
 })
 
 export interface CompletePersonalDeSoporte extends z.infer<typeof personalDeSoporteModel> {

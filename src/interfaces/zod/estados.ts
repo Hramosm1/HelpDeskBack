@@ -5,6 +5,7 @@ export const estadosModel = z.object({
   id: z.number().int().optional(),
   nombre: z.string(),
   activo: z.boolean().nullish().optional(),
+  inmutable: z.boolean().nullish().optional(),
 })
 
 export interface CompleteEstados extends z.infer<typeof estadosModel> {

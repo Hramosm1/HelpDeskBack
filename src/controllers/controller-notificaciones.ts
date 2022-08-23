@@ -1,11 +1,9 @@
 import { prisma } from "../database";
 import { Handler } from "express";
 import { NotFound, BadRequest } from "http-errors";
-import { notificacionesModel, tiposNotificacionModel } from "../interfaces/zod/index";
+import { notificacionesModel, tiposNotificacionModel } from "../interfaces/zod";
 export class Notificaciones {
-  funcion() {
 
-  }
   getTiposNotificacion: Handler = async (req, res, next) => {
     try {
       const result = await prisma.tiposNotificacion.findMany()
@@ -57,8 +55,26 @@ export class Notificaciones {
     }
   }
   getNotificaciones: Handler = async (req, res, next) => {
+    const { idUsuario } = req.params
     try {
-      const result = await prisma.notificaciones.findMany()
+      const result = await prisma.notificaciones.findMany({
+        take: 10,
+        select: {
+          id: true,
+          titulo: true,
+          descripcion: true,
+          fecha: true,
+          icono: true,
+          link: true,
+          redirecciona: true,
+          visto: true
+        },
+        where: { idUsuario },
+        orderBy: [
+          { visto: 'asc' },
+          { fecha: 'desc' }
+        ]
+      })
       res.send(result)
     } catch (ex: any) {
       next(new NotFound(ex))
@@ -69,6 +85,43 @@ export class Notificaciones {
       const data = notificacionesModel.parse(req.body)
       const result = await prisma.notificaciones.create({ data })
       res.status(201).send(result)
+    } catch (ex: any) {
+      next(new BadRequest(ex))
+    }
+  }
+  markAsRead: Handler = async (req, res, next) => {
+    const { id } = req.params
+    try {
+      const result = await prisma.notificaciones.updateMany({
+        data: { visto: true },
+        where: {
+          id
+        }
+      })
+      res.send(result)
+    } catch (ex: any) {
+      next(new BadRequest(ex))
+    }
+  }
+  markAllAsRead: Handler = async (req, res, next) => {
+    const { idUsuario } = req.params
+    try {
+      const result = await prisma.notificaciones.updateMany({
+        data: { visto: true },
+        where: {
+          idUsuario
+        }
+      })
+      res.send(result)
+    } catch (ex: any) {
+      next(new BadRequest(ex))
+    }
+  }
+  deleteNotificacion: Handler = async (req, res, next) => {
+    const { id } = req.params
+    try {
+      const result = await prisma.notificaciones.delete({ where: { id } })
+      res.send(result)
     } catch (ex: any) {
       next(new BadRequest(ex))
     }

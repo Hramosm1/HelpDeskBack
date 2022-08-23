@@ -3,6 +3,7 @@ import { Tickets } from '../controllers/controller-tickets'
 const controller = new Tickets()
 const router = Router()
 
+router.get('/qualify',controller.getToQualify)
 router.get('/:take/:page', controller.getAll)
 router.get('/:id', controller.getById)
 router.post('/', controller.create)
