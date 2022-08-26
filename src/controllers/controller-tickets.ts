@@ -1,6 +1,6 @@
-import {Handler, NextFunction, Request, Response} from 'express'
-import {BadRequest} from "http-errors"
-import {prisma} from '../database'
+import {Handler, NextFunction, Request, Response} from 'express';
+import {BadRequest} from "http-errors";
+import {prisma} from '../database';
 import {setQueryFromTickets} from '../core/utils';
 import {uniq} from "lodash";
 import {app} from "../app";
@@ -133,11 +133,14 @@ export class Tickets {
                     comentario,
                     idUsuario,
                     idTicket: Number(id),
+                    tipo: activo ? 3 : 2,
                     ComentarioDeCierre: true
                 }
             })
-            if (!ticket.activo) await NotificationsUtil
-                .createNotificationForTicketCloset(idUsuario, Number(id))
+            await ticket.activo ?
+                NotificationsUtil.createNotificationFroReOpenTicket(idUsuario, Number(id)) :
+                NotificationsUtil.createNotificationForTicketCloset(idUsuario, Number(id))
+
             res.send(ticket)
         } catch (ex: any) {
             next(new BadRequest(ex))

@@ -2,16 +2,16 @@ import * as z from "zod"
 import { CompletePersonalDeSoporte, relatedPersonalDeSoporteModel, CompleteEstados, relatedEstadosModel, CompletePrioridades, relatedPrioridadesModel, CompleteCategoriasPorTickets, relatedCategoriasPorTicketsModel, CompleteComentarios, relatedComentariosModel, CompleteDocumentoPorTicket, relatedDocumentoPorTicketModel, CompletelogTickets, relatedlogTicketsModel } from "./index"
 
 export const ticketsModel = z.object({
-  id: z.number().int().optional(),
+  id: z.number().int(),
   titulo: z.string(),
   descripcion: z.string().nullish(),
   solicitudDe: z.string(),
   asignadoA: z.number().int().nullish(),
   idPrioridad: z.number().int(),
   idEstado: z.number().int(),
-  fechaSolicitud: z.date().nullish().optional(),
-  activo: z.boolean().nullish().optional(),
-  Calificacion: z.number().int().nullish().optional(),
+  fechaSolicitud: z.date().nullish(),
+  activo: z.boolean().nullish(),
+  Calificacion: z.number().int().nullish(),
 })
 
 export interface CompleteTickets extends z.infer<typeof ticketsModel> {

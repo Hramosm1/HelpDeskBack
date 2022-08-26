@@ -2,10 +2,10 @@ import * as z from "zod"
 import { CompletelogTickets, relatedlogTicketsModel, CompleteTickets, relatedTicketsModel } from "./index"
 
 export const personalDeSoporteModel = z.object({
-  id: z.number().int().optional(),
+  id: z.number().int(),
   idUsuario: z.string(),
   nombre: z.string().nullish(),
-  activo: z.boolean().nullish().optional(),
+  activo: z.boolean().nullish(),
 })
 
 export interface CompletePersonalDeSoporte extends z.infer<typeof personalDeSoporteModel> {

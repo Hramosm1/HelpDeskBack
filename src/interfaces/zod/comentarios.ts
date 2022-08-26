@@ -1,17 +1,19 @@
 import * as z from "zod"
-import { CompleteTickets, relatedTicketsModel } from "./index"
+import { CompleteTickets, relatedTicketsModel, CompleteTiposComentario, relatedTiposComentarioModel } from "./index"
 
 export const comentariosModel = z.object({
-  id: z.string().optional(),
+  id: z.string().nullish(),
   idTicket: z.number().int(),
   idUsuario: z.string(),
   comentario: z.string(),
-  fecha: z.date().nullish().optional(),
-  ComentarioDeCierre: z.boolean().nullish().optional(),
+  fecha: z.date().nullish(),
+  ComentarioDeCierre: z.boolean().nullish(),
+  tipo: z.number().int().nullish(),
 })
 
 export interface CompleteComentarios extends z.infer<typeof comentariosModel> {
   Tickets: CompleteTickets
+  TiposComentario?: CompleteTiposComentario | null
 }
 
 /**
@@ -21,4 +23,5 @@ export interface CompleteComentarios extends z.infer<typeof comentariosModel> {
  */
 export const relatedComentariosModel: z.ZodSchema<CompleteComentarios> = z.lazy(() => comentariosModel.extend({
   Tickets: relatedTicketsModel,
+  TiposComentario: relatedTiposComentarioModel.nullish(),
 }))

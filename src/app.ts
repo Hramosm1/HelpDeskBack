@@ -14,9 +14,13 @@ import tickets from "./routes/tickets";
 import comentarios from "./routes/comentariosTickets";
 import dashboard from "./routes/dashboard"
 import notificaciones from "./routes/notificaciones";
-//import documentos from "./routes/documentos";
+import calificaciones from "./routes/calificacion";
+import pushNotifications from "./routes/pushNotifications";
 import usuarios from "./routes/usuarios"
+//import documentos from "./routes/documentos";
+
 import supertest from "supertest";
+
 class App {
   private serv: http.Server
   app: Application = express();
@@ -55,6 +59,8 @@ class App {
     this.app.use('/usuarios', usuarios)
     this.app.use('/dashboard', dashboard)
     this.app.use('/notificaciones', notificaciones)
+    this.app.use('/calificaciones',calificaciones)
+    this.app.use('/pushNotifications',pushNotifications)
     // this.app.use('/documentos', documentos)
   }
   public static get service() {

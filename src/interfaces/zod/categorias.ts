@@ -2,9 +2,9 @@ import * as z from "zod"
 import { CompleteSubCategorias, relatedSubCategoriasModel } from "./index"
 
 export const categoriasModel = z.object({
-  id: z.number().int().optional(),
+  id: z.number().int(),
   nombre: z.string(),
-  activo: z.boolean().nullish().optional(),
+  activo: z.boolean().nullish(),
 })
 
 export interface CompleteCategorias extends z.infer<typeof categoriasModel> {

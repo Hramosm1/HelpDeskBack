@@ -2,13 +2,13 @@ import * as z from "zod"
 import { CompleteEstados, relatedEstadosModel, CompleteTickets, relatedTicketsModel, CompletePersonalDeSoporte, relatedPersonalDeSoporteModel } from "./index"
 
 export const logTicketsModel = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   idTicket: z.number().int(),
   idEstado: z.number().int(),
   idUsuarioAccion: z.string(),
   idUsuarioAsignado: z.number().int().nullish(),
   accion: z.string(),
-  fecha: z.date().nullish().optional(),
+  fecha: z.date().nullish(),
 })
 
 export interface CompletelogTickets extends z.infer<typeof logTicketsModel> {

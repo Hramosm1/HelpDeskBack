@@ -2,10 +2,10 @@ import * as z from "zod"
 import { CompletelogTickets, relatedlogTicketsModel, CompleteTickets, relatedTicketsModel } from "./index"
 
 export const estadosModel = z.object({
-  id: z.number().int().optional(),
+  id: z.number().int(),
   nombre: z.string(),
-  activo: z.boolean().nullish().optional(),
-  inmutable: z.boolean().nullish().optional(),
+  activo: z.boolean().nullish(),
+  inmutable: z.boolean().nullish(),
 })
 
 export interface CompleteEstados extends z.infer<typeof estadosModel> {
