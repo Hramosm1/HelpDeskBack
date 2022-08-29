@@ -6,11 +6,13 @@ const opts: Options = {
   // dest: '/Aplicaciones/HelpDesk/files'
   storage: memoryStorage()
 }
-const upload = multer(opts)
 
 const controller = new Documentos()
 const router = Router()
 
-router.post('/:id', upload.single('file'), controller.uploadMainImage)
+//upload.single('file'), controller.uploadMainImage
+router.get('/download/:fileName', controller.getFile)
+router.get('/list/:id', controller.getFiles)
+router.post('/:id', controller.uploadFiles)
 
 export default router

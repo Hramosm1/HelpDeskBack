@@ -35,7 +35,7 @@ export class Dashboard {
                 ticketsCerrados += cerrados
             });
             //*************OPTIENE LOS TICKETS AGRUPADOS POR ASIGNACION Y ACTIVO */
-            res.send({ticketsActivos, ticketsCerrados, ticketsPorUsuario})
+            res.send({ticketsActivos, ticketsCerrados, ticketsPorUsuario, firstDay, lastDay})
 
         } catch (ex: any) {
             next(new NotFound(ex))
