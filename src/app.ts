@@ -2,7 +2,9 @@
 import express, { Application, json, urlencoded } from "express";
 import cors from "cors";
 import http from 'http';
+import fileUpload from 'express-fileupload';
 import { Server } from 'socket.io'
+//middlewares
 //importacion de rutas
 import estados from './routes/estados';
 import categorias from "./routes/categorias";
@@ -12,9 +14,14 @@ import soporte from "./routes/personalDeSoporte";
 import tickets from "./routes/tickets";
 import comentarios from "./routes/comentariosTickets";
 import dashboard from "./routes/dashboard"
-//import documentos from "./routes/documentos";
+import notificaciones from "./routes/notificaciones";
+import calificaciones from "./routes/calificacion";
+import pushNotifications from "./routes/pushNotifications";
 import usuarios from "./routes/usuarios"
+import documentos from "./routes/documentos";
+
 import supertest from "supertest";
+
 class App {
   private serv: http.Server
   app: Application = express();
@@ -40,6 +47,9 @@ class App {
     this.app.use(cors({ origin: true, credentials: true }));
     this.app.use(json({ limit: '2mb' }));
     this.app.use(urlencoded({ extended: false }));
+    this.app.use(fileUpload({
+      limits: { fileSize: 50 * 1024 * 1024 }
+    }))
   }
   //rutas
   private routes(): void {
@@ -52,7 +62,10 @@ class App {
     this.app.use('/comentarios', comentarios)
     this.app.use('/usuarios', usuarios)
     this.app.use('/dashboard', dashboard)
-    // this.app.use('/documentos', documentos)
+    this.app.use('/notificaciones', notificaciones)
+    this.app.use('/calificaciones', calificaciones)
+    this.app.use('/pushNotifications', pushNotifications)
+    this.app.use('/documentos', documentos)
   }
   public static get service() {
     return this.instance || (this.instance = new this())

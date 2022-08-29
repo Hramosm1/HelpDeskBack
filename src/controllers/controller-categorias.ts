@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { BadRequest } from "http-errors"
 import { bodyCategoria } from "../interfaces/interface-categorias";
 import { prisma } from "../database";
+import { categoriasModel } from '../interfaces/zod';
 export class Categorias {
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
@@ -28,10 +29,10 @@ export class Categorias {
         }
     }
     async create(req: Request, res: Response, next: NextFunction) {
-        const data: bodyCategoria = req.body
         try {
+            const data = categoriasModel.parse(req.body)
             const result = await prisma.categorias.create({ data })
-            res.send(result)
+            res.status(201).send(result)
         } catch (ex: any) {
             next(new BadRequest(ex))
         }

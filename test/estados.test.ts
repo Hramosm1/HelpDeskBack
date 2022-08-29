@@ -28,7 +28,7 @@ describe('POST /estados', () => {
   test('Fue creado', async () => {
     const body: bodyEstados = { nombre: 'prueba jest' }
     const result = await request.post('/estados').send(body)
-    expect(result.statusCode).toBe(200)
+    expect(result.statusCode).toBe(201)
   })
 })
 
