@@ -42,10 +42,13 @@ export class Dashboard {
         }
     }
     getAverage: RequestHandler = async (req, res, next) => {
-        const where = GetPrismaFilterByMonth('fecha', Number(req.params.mes))
+        let where = GetPrismaFilterByMonth('fecha', Number(req.params.mes))
+        const AND: any = where.AND
+        AND!.push({PersonalDeSoporte: {activo: true}})
         try {
             const data = await prisma.logTickets.findMany({
                 select: {
+
                     idTicket: true,
                     fecha: true,
                     accion: true,
@@ -55,7 +58,7 @@ export class Dashboard {
                         }
                     }
                 },
-                where: {...where, OR: [{accion: 'Nuevo ticket'}, {accion: 'cierre de ticket'}]},
+                where: {AND, OR: [{accion: 'Nuevo ticket'}, {accion: 'cierre de ticket'}]},
                 orderBy: {accion: 'desc'}
             })
             if (data.length > 0) {
@@ -75,7 +78,7 @@ export class Dashboard {
                         })
                     }
                 }
-                res.send(result)
+                res.send(result);
             } else {
                 res.send([])
             }
