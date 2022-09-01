@@ -2,7 +2,7 @@ import * as z from "zod"
 import { CompleteTickets, relatedTicketsModel } from "./index"
 
 export const prioridadesModel = z.object({
-  id: z.number().int(),
+  id: z.number().int().optional(),
   nombre: z.string(),
   color: z.string(),
   activo: z.boolean().nullish(),

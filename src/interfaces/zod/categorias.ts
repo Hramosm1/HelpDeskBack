@@ -2,7 +2,7 @@ import * as z from "zod"
 import { CompleteSubCategorias, relatedSubCategoriasModel } from "./index"
 
 export const categoriasModel = z.object({
-  id: z.number().int(),
+  id: z.number().int().optional(),
   nombre: z.string(),
   activo: z.boolean().nullish(),
 })

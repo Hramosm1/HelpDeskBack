@@ -2,7 +2,7 @@ import * as z from "zod"
 import { CompleteTickets, relatedTicketsModel } from "./index"
 
 export const documentoPorTicketModel = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   idTicket: z.number().int(),
   enlace: z.string(),
   tipoDocumento: z.string().nullish(),

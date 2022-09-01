@@ -2,7 +2,7 @@ import * as z from "zod"
 import { CompleteTickets, relatedTicketsModel, CompleteTiposComentario, relatedTiposComentarioModel } from "./index"
 
 export const comentariosModel = z.object({
-  id: z.string().nullish(),
+  id: z.string().optional(),
   idTicket: z.number().int(),
   idUsuario: z.string(),
   comentario: z.string(),

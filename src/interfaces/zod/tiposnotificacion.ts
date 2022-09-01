@@ -2,7 +2,7 @@ import * as z from "zod"
 import { CompleteNotificacionesPorRol, relatedNotificacionesPorRolModel } from "./index"
 
 export const tiposNotificacionModel = z.object({
-  id: z.number().int(),
+  id: z.number().int().optional(),
   nombre: z.string(),
 })
 

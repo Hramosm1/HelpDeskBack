@@ -2,7 +2,7 @@ import * as z from "zod"
 import { CompletelogTickets, relatedlogTicketsModel, CompleteTickets, relatedTicketsModel } from "./index"
 
 export const personalDeSoporteModel = z.object({
-  id: z.number().int(),
+  id: z.number().int().optional(),
   idUsuario: z.string(),
   nombre: z.string().nullish(),
   activo: z.boolean().nullish(),

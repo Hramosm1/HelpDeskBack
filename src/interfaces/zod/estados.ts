@@ -2,7 +2,7 @@ import * as z from "zod"
 import { CompletelogTickets, relatedlogTicketsModel, CompleteTickets, relatedTicketsModel } from "./index"
 
 export const estadosModel = z.object({
-  id: z.number().int(),
+  id: z.number().int().optional(),
   nombre: z.string(),
   activo: z.boolean().nullish(),
   inmutable: z.boolean().nullish(),

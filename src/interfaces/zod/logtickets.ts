@@ -2,7 +2,7 @@ import * as z from "zod"
 import { CompleteEstados, relatedEstadosModel, CompleteTickets, relatedTicketsModel, CompletePersonalDeSoporte, relatedPersonalDeSoporteModel } from "./index"
 
 export const logTicketsModel = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   idTicket: z.number().int(),
   idEstado: z.number().int(),
   idUsuarioAccion: z.string(),

@@ -2,7 +2,7 @@ import * as z from "zod"
 import { CompleteComentarios, relatedComentariosModel } from "./index"
 
 export const tiposComentarioModel = z.object({
-  id: z.number().int(),
+  id: z.number().int().optional(),
   tipo: z.string(),
 })
 
