@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { BadRequest } from "http-errors"
 import { prisma } from '../database'
 import { bodyPrioridades } from "../interfaces/interface-prioridades";
+import { prioridadesModel } from '../interfaces/zod';
 export class Prioridades {
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
@@ -27,10 +28,10 @@ export class Prioridades {
         }
     }
     async create(req: Request, res: Response, next: NextFunction) {
-        const data: bodyPrioridades = req.body
         try {
+            const data = prioridadesModel.parse(req.body)
             const result = await prisma.prioridades.create({ data })
-            res.send(result)
+            res.status(201).send(result)
         } catch (ex: any) {
             next(new BadRequest(ex))
         }

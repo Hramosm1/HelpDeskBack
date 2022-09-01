@@ -28,7 +28,7 @@ describe('GET /personalDeSoporte/:id', () => {
 describe('POST /personalDeSoporte', () => {
   it('Crea personal', async () => {
     const result = await request.post('/personalDeSoporte').send({ idUsuario: '2c2cae44-7b5e-4872-9a2f-74be050674d8', nombre: 'prueba unitaria' })
-    expect(result.statusCode).toBe(200)
+    expect(result.statusCode).toBe(201)
   })
 })
 /**
