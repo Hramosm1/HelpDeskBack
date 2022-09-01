@@ -26,7 +26,7 @@ describe('POST /prioridades', () => {
   test('Crea una prioridad', async () => {
     const body: bodyPrioridades = { nombre: 'prueba jest', color: "jest" }
     const result = await request.post('/prioridades').send(body)
-    expect(result.statusCode).toBe(200)
+    expect(result.statusCode).toBe(201)
   })
 })
 

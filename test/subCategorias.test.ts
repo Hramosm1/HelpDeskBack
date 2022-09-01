@@ -30,7 +30,7 @@ describe('POST /subCategorias', () => {
     const categoria: iCategoria = idCategoriaRequest.body[0]
     const body: bodySubcategoria = { nombre: 'prueba jest', idCategoria: categoria.id }
     const result = await request.post('/subCategorias').send(body)
-    expect(result.statusCode).toBe(200)
+    expect(result.statusCode).toBe(201)
   })
 })
 

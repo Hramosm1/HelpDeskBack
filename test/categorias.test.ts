@@ -25,7 +25,7 @@ describe('GET /categorias/:id', () => {
 describe('POST /categorias', () => {
   test('Verifica que se haya creado', async () => {
     const result = await request.post('/categorias').send({ nombre: 'prueba categorias' })
-    expect(result.statusCode).toBe(200)
+    expect(result.statusCode).toBe(201)
   })
 })
 
