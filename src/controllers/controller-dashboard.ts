@@ -3,40 +3,27 @@ import {prisma} from "../database";
 import {NotFound, BadRequest} from 'http-errors'
 import {getFirstAndLastDateByMonth, GetPrismaFilterByMonth} from '../core/utils';
 import {groupBy, omitBy} from 'lodash';
-import {StatsQuery} from '../interfaces/interface-dashboard';
 
 export class Dashboard {
     getStats: RequestHandler = async (req, res, next) => {
         GetPrismaFilterByMonth('fechaSolicitud', Number(req.params.mes));
         const {firstDay, lastDay} = getFirstAndLastDateByMonth(Number(req.params.mes))
         try {
-            const ticketsPorUsuario: StatsQuery[] = await prisma.$queryRaw`
-      SELECT 
-	      e.personalAsignado, 
-	      SUM(t) activos, 
-	      SUM(f) cerrados
-      FROM (
-        SELECT 
-		      pds.nombre personalAsignado, 
-		      CASE t.activo WHEN 1 THEN 1 ELSE 0 END t,
-		      CASE t.activo WHEN 0 THEN 1 ELSE 0 END f
-	      FROM Tickets t
-	      INNER JOIN PersonalDeSoporte pds
-		      ON t.asignadoA = pds.id
-	      WHERE t.fechaSolicitud > ${firstDay} AND
-	            t.fechaSolicitud < ${lastDay} AND
-	            pds.activo = 1
-      ) e
-      GROUP BY e.personalAsignado`
-            let ticketsActivos = 0
-            let ticketsCerrados = 0
-            ticketsPorUsuario.forEach(({activos, cerrados}) => {
-                ticketsActivos += activos
-                ticketsCerrados += cerrados
-            });
-            //*************OPTIENE LOS TICKETS AGRUPADOS POR ASIGNACION Y ACTIVO */
-            res.send({ticketsActivos, ticketsCerrados, ticketsPorUsuario, firstDay, lastDay})
-
+            const ticketsPorUsuario: { personal: string, activos: number, cerrados: number }[] = await prisma.$queryRaw`
+            SELECT
+                pds.nombre personal,
+                SUM(CASE WHEN t.activo = 1 THEN 1 ELSE 0 END) AS activos,
+                SUM(CASE WHEN t.activo = 0 THEN 1 ELSE 0 END) AS cerrados
+            FROM Tickets t
+            INNER JOIN PersonalDeSoporte pds 
+                on pds.id = t.asignadoA
+            WHERE
+                fechaSolicitud > ${firstDay} AND
+                fechaSolicitud < ${lastDay}
+            GROUP BY pds.nombre`;
+            const ticketsActivos = ticketsPorUsuario.reduce((prev, cur) => (prev + cur.activos), 0)
+            const ticketsCerrados = ticketsPorUsuario.reduce((prev, cur) => (prev + cur.cerrados), 0)
+            res.send({ticketsPorUsuario, ticketsActivos, ticketsCerrados})
         } catch (ex: any) {
             next(new NotFound(ex))
         }
@@ -58,7 +45,7 @@ export class Dashboard {
                         }
                     }
                 },
-                where: {AND, OR: [{accion: 'Nuevo ticket'}, {accion: 'cierre de ticket'}]},
+                where: {AND, OR: [{accion: 'Nuevo ticket'}, {accion: 'Cierre de ticket'}]},
                 orderBy: {accion: 'desc'}
             })
             if (data.length > 0) {
