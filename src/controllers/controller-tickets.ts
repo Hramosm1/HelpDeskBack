@@ -37,6 +37,7 @@ export class Tickets {
                 where,
                 orderBy: [{ activo: 'desc' }, { id: 'desc' }]
             })
+            if(tickets.length>0){
             const ids = uniq(tickets.map(({ solicitudDe }) => `'${solicitudDe}'`)).join(', ')
             const users: any[] = await prisma.$queryRawUnsafe(`SELECT id, nombre FROM Autenticacion.dbo.Usuarios u WHERE id in (${ids})`)
             const rows = tickets.map(val => {
@@ -47,6 +48,9 @@ export class Tickets {
             })
             const count = await prisma.tickets.count({ where })
             res.send({ count, rows })
+            }else {
+                res.send(tickets)
+            }
         } catch (ex: any) {
             next(new BadRequest(ex))
         }
