@@ -152,12 +152,18 @@ export class Tickets {
     }
     getToQualify: Handler = async (req, res, next) => {
         try {
-            const result = await prisma.tickets.findMany({
-                where: {
-                    AND: [{activo: false}, {Calificacion: 0}]
-                }
-            })
-            res.send(result)
+            if (req.query.idUsuario){
+                const idUsuario = req.query.idUsuario as string
+                const result = await prisma.notificaciones.findMany({
+                    where: {
+                        AND: [{idUsuario}, {activo:true}, {titulo:'Calificacion de ticket'}]
+                    }
+                })
+                res.send(result)
+            }
+            else {
+                throw 'bad request';
+            }
         } catch (ex: any) {
             next(new BadRequest(ex))
         }
