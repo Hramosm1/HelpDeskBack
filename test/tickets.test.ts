@@ -36,7 +36,7 @@ describe('GET /tickets/:take/:page?query', () => {
 
 describe('GET /tickets', () => {
     it('Regresa con los tickets pendientes de calificar', async function () {
-        const result = await request.get('/tickets?idUsuario=26EAD5F0-0689-4D28-82EB-90A49DE83955')
+        const result = await request.get('/tickets?idUser=26ead5f0-0689-4d28-82eb-90a49de83955')
         expect(result.body).toBeInstanceOf(Array);
     });
 })

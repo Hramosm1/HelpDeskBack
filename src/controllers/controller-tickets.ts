@@ -152,7 +152,7 @@ export class Tickets {
     }
     getToQualify: Handler = async (req, res, next) => {
         try {
-            if (req.query.idUsuario){
+            if (req.query.idUser){
                 const idUsuario = req.query.idUsuario as string
                 const result = await prisma.notificaciones.findMany({
                     where: {
