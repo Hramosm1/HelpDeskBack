@@ -1,0 +1,4 @@
+GET {{host}}/tickets?idUser=4B53BED9-3FA5-40E7-8093-F0435BE58916
+Accept: application/json
+
+###

@@ -39,4 +39,12 @@ describe('GET /tickets', () => {
         const result = await request.get('/tickets?idUser=26ead5f0-0689-4d28-82eb-90a49de83955')
         expect(result.body).toBeInstanceOf(Array);
     });
+    it('Regresa solo tickets de el id solicitado', async function () {
+        const id = '26ead5f0-0689-4d28-82eb-90a49de83955'
+        const result = await request.get('/tickets?idUser='+id)
+        const expected = result.body>0?
+            result.body.every((notificacion:any)=>notificacion.idUsuario===id):
+            true
+        expect(expected).toBe(true);
+    });
 })
