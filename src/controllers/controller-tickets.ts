@@ -1,13 +1,13 @@
-import { Handler, NextFunction, Request, Response } from 'express';
-import { BadRequest, Forbidden, NotFound } from "http-errors";
-import { prisma } from '../database';
-import { setQueryFromTickets } from '../core/utils';
-import { uniq } from "lodash";
-import { app } from "../app";
-import { z } from "zod";
+import {Handler, NextFunction, Request, Response} from 'express';
+import {BadRequest, Forbidden, NotFound} from "http-errors";
+import {prisma} from '../database';
+import {setQueryFromTickets} from '../core/utils';
+import {uniq} from "lodash";
+import {app} from "../app";
+import {z} from "zod";
 
 
-import { NotificationsUtil } from '../core/notificaciones.util';
+import {NotificationsUtil} from '../core/notificaciones.util';
 
 export class Tickets {
     getAll: Handler = async (req, res, next) => {
@@ -23,9 +23,9 @@ export class Tickets {
                     solicitudDe: true,
                     fechaSolicitud: true,
                     activo: true,
-                    Prioridades: { select: { nombre: true, color: true } },
-                    Estados: { select: { nombre: true } },
-                    PersonalDeSoporte: { select: { idUsuario: true, nombre: true } },
+                    Prioridades: {select: {nombre: true, color: true}},
+                    Estados: {select: {nombre: true}},
+                    PersonalDeSoporte: {select: {idUsuario: true, nombre: true}},
                     Comentarios: {
                         select: {
                             id: true
@@ -35,24 +35,28 @@ export class Tickets {
                 take,
                 skip,
                 where,
-                orderBy: [{ activo: 'desc' }, { id: 'desc' }]
+                orderBy: [{activo: 'desc'}, {id: 'desc'}]
             })
-            const ids = uniq(tickets.map(({ solicitudDe }) => `'${solicitudDe}'`)).join(', ')
-            const users: any[] = await prisma.$queryRawUnsafe(`SELECT id, nombre FROM Autenticacion.dbo.Usuarios u WHERE id in (${ids})`)
-            const rows = tickets.map(val => {
-                let newRow: any = val
-                newRow.solicitudDe = users.find(us => us.id === val.solicitudDe)
-                newRow.Comentarios = val.Comentarios.length
-                return newRow
-            })
-            const count = await prisma.tickets.count({ where })
-            res.send({ count, rows })
+            if (tickets.length > 0) {
+                const ids = uniq(tickets.map(({solicitudDe}) => `'${solicitudDe}'`)).join(', ')
+                const users: any[] = await prisma.$queryRawUnsafe(`SELECT id, nombre FROM Autenticacion.dbo.Usuarios u WHERE id in (${ids})`)
+                const rows = tickets.map(val => {
+                    let newRow: any = val
+                    newRow.solicitudDe = users.find(us => us.id === val.solicitudDe)
+                    newRow.Comentarios = val.Comentarios.length
+                    return newRow
+                })
+                const count = await prisma.tickets.count({where})
+                res.send({count, rows})
+            } else {
+                res.send(tickets)
+            }
         } catch (ex: any) {
             next(new BadRequest(ex))
         }
     };
     getById: Handler = async (req, res, next) => {
-        const { id } = req.params
+        const {id} = req.params
         let result
         try {
             const tickets = await prisma.tickets.findUnique({
@@ -61,11 +65,11 @@ export class Tickets {
                     Prioridades: true,
                     Estados: true,
                 },
-                where: { id: Number(id) }
+                where: {id: Number(id)}
             })
             if (tickets) {
                 const nombreSolicitante = await prisma.$queryRaw`SELECT id, nombre FROM Autenticacion.dbo.Usuarios WHERE id=${tickets.solicitudDe}`
-                result = { ...tickets, nombreSolicitante }
+                result = {...tickets, nombreSolicitante}
             }
             res.send(result)
         } catch (ex: any) {
@@ -73,8 +77,8 @@ export class Tickets {
         }
     }
     create: Handler = async (req, res, next) => {
-        const { titulo, descripcion, prioridad, estado, categorias, solicitudDe, asignadoA } = req.body
-        const ncategorias = categorias.map((id: number) => ({ idSubCategoria: id }))
+        const {titulo, descripcion, prioridad, estado, categorias, solicitudDe, asignadoA} = req.body
+        const ncategorias = categorias.map((id: number) => ({idSubCategoria: id}))
         try {
             const ticket = await prisma.tickets.create({
                 data: {
@@ -84,13 +88,13 @@ export class Tickets {
                     idEstado: estado,
                     solicitudDe,
                     asignadoA,
-                    CategoriasPorTickets: { createMany: { data: ncategorias } }
+                    CategoriasPorTickets: {createMany: {data: ncategorias}}
                 }
             })
             await NotificationsUtil
                 .createNotificationForNewTicket(ticket.titulo, ticket.id, ticket.solicitudDe)
             if (ticket.asignadoA) await NotificationsUtil
-                .createNotificationForAsignation(ticket.asignadoA, ticket.id)
+                .createNotificationForAsignation(ticket.asignadoA, solicitudDe, ticket.id)
             app.io.emit('nuevoTicket')
             res.status(201).send(ticket)
         } catch (ex: any) {
@@ -98,7 +102,7 @@ export class Tickets {
         }
     }
     editById = async (req: Request, res: Response, next: NextFunction) => {
-        const { id } = req.params
+        const {id} = req.params
         const body = z.object({
             asignadoA: z.number(),
             idEstado: z.number().optional()
@@ -106,24 +110,24 @@ export class Tickets {
         try {
             let data = body.parse(req.body)
             const estado = await prisma.tickets.findUnique({
-                select: { idEstado: true },
-                where: { id: Number(id) }
+                select: {idEstado: true},
+                where: {id: Number(id)}
             })
             if (estado!.idEstado === 1) data.idEstado = 3
-            const result = await prisma.tickets.update({ data, where: { id: Number(id) } })
+            const result = await prisma.tickets.update({data, where: {id: Number(id)}})
             if (data.asignadoA) await NotificationsUtil
-                .createNotificationForAsignation(data.asignadoA, Number(id))
+                .createNotificationForAsignation(data.asignadoA, result.solicitudDe, Number(id))
             res.send(result)
         } catch (ex: any) {
             next(new BadRequest(ex))
         }
     };
     cerrarTicket: Handler = async (req, res, next) => {
-        const { id } = req.params
-        const { comentario, idUsuario, activo } = req.body
+        const {id} = req.params
+        const {comentario, idUsuario, activo} = req.body
         try {
             const ticket = await prisma.tickets.update({
-                data: { idEstado: activo ? 4 : 2, activo },
+                data: {idEstado: activo ? 4 : 2, activo},
                 where: {
                     id: Number(id)
                 }
@@ -139,7 +143,7 @@ export class Tickets {
             })
             await ticket.activo ?
                 NotificationsUtil.createNotificationFroReOpenTicket(idUsuario, Number(id)) :
-                NotificationsUtil.createNotificationForTicketCloset(idUsuario, Number(id))
+                NotificationsUtil.createNotificationForTicketCloset(idUsuario, ticket.solicitudDe, Number(id))
 
             res.send(ticket)
         } catch (ex: any) {
@@ -148,12 +152,18 @@ export class Tickets {
     }
     getToQualify: Handler = async (req, res, next) => {
         try {
-            const result = await prisma.tickets.findMany({
-                where: {
-                    AND: [{ activo: false }, { Calificacion: 0 }]
-                }
-            })
-            res.send(result)
+            if (req.query.idUser){
+                const idUsuario = req.query.idUsuario as string
+                const result = await prisma.notificaciones.findMany({
+                    where: {
+                        AND: [{idUsuario}, {activo:true}, {titulo:'Calificacion de ticket'}]
+                    }
+                })
+                res.send(result)
+            }
+            else {
+                throw 'bad request';
+            }
         } catch (ex: any) {
             next(new BadRequest(ex))
         }
@@ -165,16 +175,16 @@ export class Tickets {
 
 
         try {
-            const body = z.object({ calificacion: z.number(), comentario: z.string() }).parse(req.body)
+            const body = z.object({calificacion: z.number(), comentario: z.string()}).parse(req.body)
             const ticket = await prisma.tickets.findUnique({
-                select: { solicitudDe: true },
-                where: { id: Number(idTicket) }
+                select: {solicitudDe: true},
+                where: {id: Number(idTicket)}
             })
             if (ticket) {
                 if (ticket.solicitudDe === idUsuario) {
                     await prisma.tickets.update({
-                        where: { id: Number(idTicket) },
-                        data: { Calificacion: body.calificacion }
+                        where: {id: Number(idTicket)},
+                        data: {Calificacion: body.calificacion}
                     })
                     await prisma.comentarios.create({
                         data: {
@@ -186,10 +196,10 @@ export class Tickets {
                         }
                     })
                     await prisma.notificaciones.updateMany({
-                        data: { activo: false },
-                        where: { link: { equals: `tickets/qualify/${req.params.idTicket}` } }
+                        data: {activo: false},
+                        where: {link: {equals: `tickets/qualify/${req.params.idTicket}`}}
                     })
-                    res.status(201).send({ message: 'Calificacion enviada' })
+                    res.status(201).send({message: 'Calificacion enviada'})
                 } else {
                     next(new Forbidden('Solo el usuario que creo el ticket puede calificarlo'))
                 }

@@ -20,8 +20,10 @@ export class NotificationsUtil {
         app.io.emit('notificacion', null)
     }
 
-    static async createNotificationForAsignation(asignadoA: number, id: number) {
+    static async createNotificationForAsignation(asignadoA: number, solicitudDe: string, id: number) {
         const listOfUsers = await this.getListOfUsers(3)
+        if (!listOfUsers.some(x => x.idUsuario === solicitudDe)) listOfUsers
+            .push({idUsuario: solicitudDe})
         const usuario = await prisma.personalDeSoporte.findUnique({
             select: {idUsuario: true, nombre: true},
             where: {id: asignadoA!}
@@ -49,8 +51,14 @@ export class NotificationsUtil {
 
     static async createNotificationForComent(idTicket: number, idUsuarioComentario: string) {
         const listOfUsers = await this.getListOfUsers(4)
+        const ticket = await prisma.tickets.findUnique({where: {id: idTicket}})
+        if (ticket && !listOfUsers.some(x => x.idUsuario === ticket.solicitudDe)) listOfUsers
+            .push({idUsuario: ticket.solicitudDe})
         const usuario: { nombre: string }[] = await prisma.$queryRaw`
-    SELECT nombre FROM Autenticacion.dbo.Usuarios WHERE id = ${idUsuarioComentario}`
+            SELECT 
+                nombre 
+            FROM Autenticacion.dbo.Usuarios 
+            WHERE id = ${idUsuarioComentario}`
         const data = listOfUsers.map(({idUsuario}) => ({
             idUsuario,
             titulo: 'Nuevo comentario',
@@ -63,9 +71,10 @@ export class NotificationsUtil {
         app.io.emit('notificacion', null)
     }
 
-    static async createNotificationForTicketCloset(idUsuarioCierre: string, idTicket: number) {
+    static async createNotificationForTicketCloset(idUsuarioCierre: string, solicitudDe: string, idTicket: number) {
         const listOfUsers = await this.getListOfUsers(2)
-
+        if (!listOfUsers.some(x => x.idUsuario === solicitudDe)) listOfUsers
+            .push({idUsuario: solicitudDe})
         const usuario: { nombre: string }[] = await prisma.$queryRaw`
             SELECT nombre FROM Autenticacion.dbo.Usuarios WHERE id = ${idUsuarioCierre}`
         const data = listOfUsers.map(({idUsuario}) => ({
@@ -81,7 +90,7 @@ export class NotificationsUtil {
         app.io.emit('notificacion', null)
     }
 
-    static async createNotificationFroReOpenTicket(idUsuarioCierre: string, idTicket: number){
+    static async createNotificationFroReOpenTicket(idUsuarioCierre: string, idTicket: number) {
         const listOfUsers = await this.getListOfUsers(5)
         const usuario: { nombre: string }[] = await prisma.$queryRaw`
             SELECT nombre FROM Autenticacion.dbo.Usuarios WHERE id = ${idUsuarioCierre}`
